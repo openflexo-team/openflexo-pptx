@@ -43,11 +43,11 @@ import java.util.logging.Logger;
 import org.openflexo.foundation.PamelaResourceModelFactory;
 import org.openflexo.foundation.action.FlexoUndoManager;
 import org.openflexo.foundation.resource.PamelaResourceImpl.IgnoreLoadingEdits;
-import org.openflexo.pamela.ModelContextLibrary;
+import org.openflexo.pamela.PamelaMetaModelLibrary;
 import org.openflexo.pamela.converter.RelativePathResourceConverter;
 import org.openflexo.pamela.exceptions.ModelDefinitionException;
 import org.openflexo.pamela.factory.EditingContext;
-import org.openflexo.pamela.factory.ModelFactory;
+import org.openflexo.pamela.factory.PamelaModelFactory;
 import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource;
 
 /**
@@ -57,7 +57,7 @@ import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource
  * @author sylvain
  * 
  */
-public class PowerpointModelFactory extends ModelFactory implements PamelaResourceModelFactory<PowerpointSlideshowResource> {
+public class PowerpointModelFactory extends PamelaModelFactory implements PamelaResourceModelFactory<PowerpointSlideshowResource> {
 
 	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(PowerpointModelFactory.class.getPackage().getName());
@@ -69,7 +69,7 @@ public class PowerpointModelFactory extends ModelFactory implements PamelaResour
 	private RelativePathResourceConverter relativePathResourceConverter;
 
 	public PowerpointModelFactory(PowerpointSlideshowResource resource, EditingContext editingContext) throws ModelDefinitionException {
-		super(ModelContextLibrary.getCompoundModelContext(PowerpointSlideshow.class));
+		super(PamelaMetaModelLibrary.getCompoundModelContext(PowerpointSlideshow.class));
 		this.resource = resource;
 		setEditingContext(editingContext);
 		addConverter(relativePathResourceConverter = new RelativePathResourceConverter(null));

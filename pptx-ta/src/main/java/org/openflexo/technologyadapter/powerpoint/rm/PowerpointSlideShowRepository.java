@@ -43,7 +43,7 @@ import org.openflexo.foundation.resource.FlexoResourceCenter;
 import org.openflexo.foundation.technologyadapter.TechnologyAdapterResourceRepository;
 import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.pamela.exceptions.ModelDefinitionException;
-import org.openflexo.pamela.factory.ModelFactory;
+import org.openflexo.pamela.factory.PamelaModelFactory;
 import org.openflexo.technologyadapter.powerpoint.PowerpointTechnologyAdapter;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
 
@@ -59,9 +59,9 @@ public interface PowerpointSlideShowRepository<I>
 
 	public static <I> PowerpointSlideShowRepository<I> instanciateNewRepository(PowerpointTechnologyAdapter technologyAdapter,
 			FlexoResourceCenter<I> resourceCenter) {
-		ModelFactory factory;
+		PamelaModelFactory factory;
 		try {
-			factory = new ModelFactory(PowerpointSlideShowRepository.class);
+			factory = new PamelaModelFactory(PowerpointSlideShowRepository.class);
 			PowerpointSlideShowRepository<I> newRepository = factory.newInstance(PowerpointSlideShowRepository.class);
 			newRepository.setTechnologyAdapter(technologyAdapter);
 			newRepository.setResourceCenter(resourceCenter);

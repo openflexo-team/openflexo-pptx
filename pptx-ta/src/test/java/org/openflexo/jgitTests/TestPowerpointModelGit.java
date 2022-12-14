@@ -32,9 +32,9 @@ import org.openflexo.foundation.resource.GitResourceCenter;
 import org.openflexo.foundation.resource.ResourceLoadingCancelledException;
 import org.openflexo.foundation.technologyadapter.ModelSlot;
 import org.openflexo.foundation.test.OpenFlexoTestCaseWithGit;
-import org.openflexo.pamela.ModelContextLibrary;
+import org.openflexo.pamela.PamelaMetaModelLibrary;
 import org.openflexo.pamela.exceptions.ModelDefinitionException;
-import org.openflexo.pamela.factory.ModelFactory;
+import org.openflexo.pamela.factory.PamelaModelFactory;
 import org.openflexo.technologyadapter.powerpoint.PowerpointTechnologyAdapter;
 import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideShowRepository;
 import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource;
@@ -184,8 +184,8 @@ public class TestPowerpointModelGit extends OpenFlexoTestCaseWithGit {
 	@TestOrder(4)
 	public void retrieveFileInGitRepository() throws NoWorkTreeException, IOException, ModelDefinitionException {
 		try (Repository gitRepository = gitResourceCenter.getGitRepository()) {
-			ModelFactory factory = new ModelFactory(
-					ModelContextLibrary.getCompoundModelContext(GitIODelegate.class, PowerpointSlideshowResource.class));
+			PamelaModelFactory factory = new PamelaModelFactory(
+					PamelaMetaModelLibrary.getCompoundModelContext(GitIODelegate.class, PowerpointSlideshowResource.class));
 			Collection<FlexoResource<?>> ressources = gitResourceCenter.getAllResources();
 			for (FlexoResource<?> flexoResource : ressources) {
 				// flexoResource.setFlexoIODelegate(FlexoIOGitDelegateImpl.makeFlexoIOGitDelegate(flexoResource.getName(),
