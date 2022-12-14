@@ -69,7 +69,7 @@ public class PowerpointModelFactory extends PamelaModelFactory implements Pamela
 	private RelativePathResourceConverter relativePathResourceConverter;
 
 	public PowerpointModelFactory(PowerpointSlideshowResource resource, EditingContext editingContext) throws ModelDefinitionException {
-		super(PamelaMetaModelLibrary.getCompoundModelContext(PowerpointSlideshow.class));
+		super(PamelaMetaModelLibrary.retrieveMetaModel(PowerpointSlideshow.class));
 		this.resource = resource;
 		setEditingContext(editingContext);
 		addConverter(relativePathResourceConverter = new RelativePathResourceConverter(null));

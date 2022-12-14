@@ -185,7 +185,7 @@ public class TestPowerpointModelGit extends OpenFlexoTestCaseWithGit {
 	public void retrieveFileInGitRepository() throws NoWorkTreeException, IOException, ModelDefinitionException {
 		try (Repository gitRepository = gitResourceCenter.getGitRepository()) {
 			PamelaModelFactory factory = new PamelaModelFactory(
-					PamelaMetaModelLibrary.getCompoundModelContext(GitIODelegate.class, PowerpointSlideshowResource.class));
+					PamelaMetaModelLibrary.retrieveMetaModel(GitIODelegate.class, PowerpointSlideshowResource.class));
 			Collection<FlexoResource<?>> ressources = gitResourceCenter.getAllResources();
 			for (FlexoResource<?> flexoResource : ressources) {
 				// flexoResource.setFlexoIODelegate(FlexoIOGitDelegateImpl.makeFlexoIOGitDelegate(flexoResource.getName(),
