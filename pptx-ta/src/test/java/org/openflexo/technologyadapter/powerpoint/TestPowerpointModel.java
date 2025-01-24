@@ -168,7 +168,8 @@ public class TestPowerpointModel extends OpenflexoProjectAtRunTimeTestCase {
 
 		assertNotNull(testApplicationContext.getVirtualModelLibrary().getVirtualModel(VIEWPOINT_URI));
 
-		CompilationUnitResource newCompilationUnitResource = factory.makeContainedCompilationUnitResource(VIRTUAL_MODEL_NAME, compilationUnitResource, true);
+		CompilationUnitResource newCompilationUnitResource = factory.makeContainedCompilationUnitResource(VIRTUAL_MODEL_NAME,
+				compilationUnitResource, true);
 		VirtualModel newVirtualModel = newCompilationUnitResource.getLoadedResourceData().getVirtualModel();
 
 		// VirtualModel newVirtualModel = null;
@@ -180,7 +181,8 @@ public class TestPowerpointModel extends OpenflexoProjectAtRunTimeTestCase {
 		newVirtualModel.addToFlexoConcepts(newFlexoConcept);
 		if (powerpointAdapter.getAvailableModelSlotTypes() != null) {
 			for (Class<? extends ModelSlot<?>> msType : powerpointAdapter.getAvailableModelSlotTypes()) {
-				AddUseDeclaration useDeclarationAction = AddUseDeclaration.actionType.makeNewAction(newVirtualModel, null, _editor);
+				AddUseDeclaration useDeclarationAction = AddUseDeclaration.actionType.makeNewAction(newVirtualModel.getCompilationUnit(),
+						null, _editor);
 				useDeclarationAction.setModelSlotClass(msType);
 				useDeclarationAction.doAction();
 				ModelSlot modelSlot = powerpointAdapter.makeModelSlot(msType, newVirtualModel);
@@ -256,7 +258,7 @@ public class TestPowerpointModel extends OpenflexoProjectAtRunTimeTestCase {
 		VirtualModel test1ViewPoint = loadViewPoint("http://openflexo.org/test/TestResourceCenter/TestPPTViewPoint.fml");
 		assertNotNull(test1ViewPoint);
 
-		System.out.println("dir=" + ((CompilationUnitResource) test1ViewPoint.getResource()).getDirectory());
+		System.out.println("dir=" + test1ViewPoint.getResource().getDirectory());
 		System.out.println("VMs=" + test1ViewPoint.getVirtualModels());
 
 		VirtualModel vm = test1ViewPoint.getVirtualModelNamed("TestPPTVirtualModel");
@@ -273,7 +275,8 @@ public class TestPowerpointModel extends OpenflexoProjectAtRunTimeTestCase {
 		log("Testing ViewPoint loading: " + viewPointURI);
 		System.out.println("resourceCenter=" + resourceCenter);
 		System.out.println("resourceCenter.getViewPointRepository()=" + resourceCenter.getVirtualModelRepository());
-		CompilationUnitResource viewPointResource = testApplicationContext.getVirtualModelLibrary().getCompilationUnitResource(viewPointURI);
+		CompilationUnitResource viewPointResource = testApplicationContext.getVirtualModelLibrary()
+				.getCompilationUnitResource(viewPointURI);
 		assertNotNull(viewPointResource);
 		VirtualModel viewPoint = viewPointResource.getCompilationUnit().getVirtualModel();
 		assertTrue(viewPointResource.isLoaded());
