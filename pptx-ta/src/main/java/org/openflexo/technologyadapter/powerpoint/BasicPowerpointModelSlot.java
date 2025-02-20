@@ -57,6 +57,7 @@ import org.openflexo.technologyadapter.powerpoint.fml.editionaction.SelectPowerp
 import org.openflexo.technologyadapter.powerpoint.fml.editionaction.SelectPowerpointSlide;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointObject;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
+import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource;
 
 /**
  * Implementation of a basic ModelSlot class for the Powerpoint technology adapter<br>
@@ -73,7 +74,7 @@ import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
 @FML("BasicPowerpointModelSlot")
 public interface BasicPowerpointModelSlot extends PowerpointModelSlot {
 
-	public static abstract class BasicPowerpointModelSlotImpl extends FreeModelSlotImpl<PowerpointSlideshow>
+	public static abstract class BasicPowerpointModelSlotImpl extends FreeModelSlotImpl<PowerpointSlideshow, PowerpointSlideshowResource>
 			implements BasicPowerpointModelSlot {
 
 		private static final Logger logger = Logger.getLogger(BasicPowerpointModelSlot.class.getPackage().getName());

@@ -180,7 +180,7 @@ public class TestPowerpointModel extends OpenflexoProjectAtRunTimeTestCase {
 		FlexoConcept newFlexoConcept = newVirtualModel.getFMLModelFactory().newFlexoConcept();
 		newVirtualModel.addToFlexoConcepts(newFlexoConcept);
 		if (powerpointAdapter.getAvailableModelSlotTypes() != null) {
-			for (Class<? extends ModelSlot<?>> msType : powerpointAdapter.getAvailableModelSlotTypes()) {
+			for (Class<? extends ModelSlot<?,?>> msType : powerpointAdapter.getAvailableModelSlotTypes()) {
 				AddUseDeclaration useDeclarationAction = AddUseDeclaration.actionType.makeNewAction(newVirtualModel.getCompilationUnit(),
 						null, _editor);
 				useDeclarationAction.setModelSlotClass(msType);

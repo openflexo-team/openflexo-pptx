@@ -48,9 +48,10 @@ import org.openflexo.foundation.technologyadapter.FreeModelSlot;
 import org.openflexo.pamela.annotations.Implementation;
 import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
+import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource;
 
 @ModelEntity
-public interface PowerpointModelSlot extends FreeModelSlot<PowerpointSlideshow> {
+public interface PowerpointModelSlot extends FreeModelSlot<PowerpointSlideshow, PowerpointSlideshowResource> {
 
 	@Implementation
 	public abstract class PowerpointModelSlotImpl implements PowerpointModelSlot {
