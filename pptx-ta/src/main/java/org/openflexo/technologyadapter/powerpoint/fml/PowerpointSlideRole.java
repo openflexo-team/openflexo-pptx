@@ -87,7 +87,7 @@ public interface PowerpointSlideRole extends FlexoRole<PowerpointSlide> {
 
 		@Override
 		public ActorReference<PowerpointSlide> makeActorReference(PowerpointSlide object, FlexoConceptInstance fci) {
-			AbstractVirtualModelInstanceModelFactory<?> factory = fci.getFactory();
+			AbstractVirtualModelInstanceModelFactory factory = fci.getFactory();
 			PowerpointActorReference returned = factory.newInstance(PowerpointActorReference.class);
 			returned.setFlexoRole(this);
 			returned.setFlexoConceptInstance(fci);
