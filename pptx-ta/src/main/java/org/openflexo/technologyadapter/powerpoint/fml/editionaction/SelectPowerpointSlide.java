@@ -39,6 +39,7 @@
 package org.openflexo.technologyadapter.powerpoint.fml.editionaction;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -71,8 +72,11 @@ public interface SelectPowerpointSlide extends FetchRequest<BasicPowerpointModel
 
 		@Override
 		public List<PowerpointSlide> performExecute(RunTimeEvaluationContext evaluationContext) {
-
-			return null;
+			PowerpointSlideshow slideshow = getReceiver(evaluationContext);
+			if (slideshow == null) {
+				return new ArrayList<>();
+			}
+			return filterWithConditions(new ArrayList<>(slideshow.getPowerpointSlides()), evaluationContext);
 		}
 	}
 

@@ -39,6 +39,7 @@
 package org.openflexo.technologyadapter.powerpoint.fml.editionaction;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -50,6 +51,7 @@ import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.technologyadapter.powerpoint.BasicPowerpointModelSlot;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
 
 @ModelEntity
@@ -71,8 +73,15 @@ public interface SelectPowerpointShape extends FetchRequest<BasicPowerpointModel
 
 		@Override
 		public List<PowerpointShape> performExecute(RunTimeEvaluationContext evaluationContext) {
-
-			return null;
+			PowerpointSlideshow slideshow = getReceiver(evaluationContext);
+			if (slideshow == null) {
+				return new ArrayList<>();
+			}
+			List<PowerpointShape> candidates = new ArrayList<>();
+			for (PowerpointSlide slide : slideshow.getPowerpointSlides()) {
+				candidates.addAll(slide.getPowerpointShapes());
+			}
+			return filterWithConditions(candidates, evaluationContext);
 		}
 	}
 

@@ -39,11 +39,9 @@
 package org.openflexo.technologyadapter.powerpoint.fml.editionaction;
 
 import java.lang.reflect.Type;
-import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.poi.hslf.model.AutoShape;
-import org.apache.poi.hslf.model.ShapeTypes;
 import org.openflexo.connie.DataBinding;
 import org.openflexo.connie.exception.NullReferenceException;
 import org.openflexo.connie.exception.TypeMismatchException;
@@ -56,7 +54,14 @@ import org.openflexo.technologyadapter.powerpoint.BasicPowerpointModelSlot;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointTextBox;
 
+/**
+ * FML edition action creating a new text box (backed by a POI XSLFTextBox) in a target {@link PowerpointSlide}.
+ *
+ * @author sylvain
+ *
+ */
 @ModelEntity
 @ImplementationClass(AddPowerpointShape.AddPowerpointShapeImpl.class)
 @XMLElement
@@ -67,15 +72,18 @@ public interface AddPowerpointShape extends PowerpointAction<PowerpointShape> {
 
 	public void setPowerpointSlide(DataBinding<PowerpointSlide> powerpointSlide);
 
+	public DataBinding<String> getText();
+
+	public void setText(DataBinding<String> text);
+
 	public static abstract class AddPowerpointShapeImpl
 			extends TechnologySpecificActionDefiningReceiverImpl<BasicPowerpointModelSlot, PowerpointSlideshow, PowerpointShape>
 			implements AddPowerpointShape {
 
 		private static final Logger logger = Logger.getLogger(AddPowerpointShape.class.getPackage().getName());
 
-		private DataBinding<List<PowerpointShape>> powerpointShapes;
-
 		private DataBinding<PowerpointSlide> powerpointSlide;
+		private DataBinding<String> text;
 
 		@Override
 		public Type getAssignableType() {
@@ -85,34 +93,24 @@ public interface AddPowerpointShape extends PowerpointAction<PowerpointShape> {
 		@Override
 		public PowerpointShape execute(RunTimeEvaluationContext evaluationContext) {
 
-			PowerpointShape powerpointShape = null;
-
 			PowerpointSlideshow receiver = getReceiver(evaluationContext);
 
 			try {
 				PowerpointSlide powerpointSlide = getPowerpointSlide().getBindingValue(evaluationContext);
 				if (powerpointSlide != null) {
-
-					AutoShape shape = new AutoShape(ShapeTypes.Chevron);
-
-					powerpointShape = receiver.getConverter().convertPowerpointShapeToShape(shape, powerpointSlide, null);
-					powerpointSlide.getSlide().addShape(shape);
-					receiver.setIsModified();
+					String textValue = getText().isSet() ? getText().getBindingValue(evaluationContext) : "";
+					PowerpointTextBox textBox = powerpointSlide.addTextBox(textValue != null ? textValue : "", 50, 50, 300, 50);
+					if (receiver != null) {
+						receiver.setIsModified();
+					}
+					return textBox;
 				}
-				else {
-					logger.warning("Create a row requires a sheet");
-				}
-
-			} catch (TypeMismatchException e) {
-				e.printStackTrace();
-			} catch (NullReferenceException e) {
-				e.printStackTrace();
-			} catch (ReflectiveOperationException e) {
-				e.printStackTrace();
+				logger.warning("Creating a shape requires a target slide");
+			} catch (TypeMismatchException | NullReferenceException | ReflectiveOperationException e) {
+				logger.log(Level.WARNING, "Cannot evaluate binding while adding a PowerPoint shape", e);
 			}
 
-			return powerpointShape;
-
+			return null;
 		}
 
 		@Override
@@ -133,6 +131,26 @@ public interface AddPowerpointShape extends PowerpointAction<PowerpointShape> {
 				powerpointSlide.setBindingName("powerpointSlide");
 			}
 			this.powerpointSlide = powerpointSlide;
+		}
+
+		@Override
+		public DataBinding<String> getText() {
+			if (text == null) {
+				text = new DataBinding<>(this, String.class, DataBinding.BindingDefinitionType.GET);
+				text.setBindingName("text");
+			}
+			return text;
+		}
+
+		@Override
+		public void setText(DataBinding<String> text) {
+			if (text != null) {
+				text.setOwner(this);
+				text.setDeclaredType(String.class);
+				text.setBindingDefinitionType(DataBinding.BindingDefinitionType.GET);
+				text.setBindingName("text");
+			}
+			this.text = text;
 		}
 
 	}

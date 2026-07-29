@@ -1,1 +1,1 @@
-include 'pptx-ta', 'pptx-ta-test-rc', 'pptx-ta-ui'
+include 'pptx-ta', 'pptx-ta-test', 'pptx-ta-test-rc', 'pptx-ta-ui'

@@ -117,12 +117,10 @@ public interface BasicPowerpointModelSlot extends PowerpointModelSlot {
 
 		@Override
 		public Object retrieveObjectWithURI(PowerpointSlideshow resourceData, String objectURI) {
-
 			try {
 				return getUriProcessor().retrieveObjectWithURI(resourceData, objectURI);
-
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.log(java.util.logging.Level.WARNING, "Cannot retrieve PowerPoint object with URI " + objectURI, e);
 			}
 			return null;
 		}
@@ -131,20 +129,6 @@ public interface BasicPowerpointModelSlot extends PowerpointModelSlot {
 		public PowerpointTechnologyAdapter getModelSlotTechnologyAdapter() {
 			return (PowerpointTechnologyAdapter) super.getModelSlotTechnologyAdapter();
 		}
-
-		/*@Override
-		public PowerpointSlideshowResource createProjectSpecificEmptyResource(VirtualModelInstance<?, ?> view, String filename,
-				String modelUri) {
-			try {
-				return getModelSlotTechnologyAdapter().createNewSlideshow((FlexoResourceCenter<File>) view.getResourceCenter(), filename,
-						modelUri);
-			} catch (SaveResourceException e) {
-				e.printStackTrace();
-			} catch (ModelDefinitionException e) {
-				e.printStackTrace();
-			}
-			return null;
-		}*/
 
 	}
 

@@ -1,0 +1,35 @@
+// Use case: mount a .pptx presentation through an FML VirtualModel (PowerPoint model slot),
+// then use FML "select ... from" fetch requests to query slides and shapes.
+
+// Load the FML VirtualModel describing the use case
+demoModel = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/FML/PowerpointDemo.fml"];
+assert demoModel != null;
+
+// Load the presentation to be mounted in the model slot
+ppt = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Sample.pptx"];
+assert ppt != null;
+
+// Instantiate the VirtualModel, connecting the model slot to the presentation resource
+service ResourceCenterService add_temp_rc;
+demo = new PowerpointDemo(ppt.resource) with (name="powerpointDemoInstance");
+assert demo != null;
+
+// select PowerpointSlide from slideshow -> the 2 slides
+slides = demo.allSlides();
+assert slides != null;
+assert slides.size() == 2;
+
+// select PowerpointShape from slideshow -> the 3 shapes (1 on slide 0, 2 on slide 1)
+shapes = demo.allShapes();
+assert shapes != null;
+assert shapes.size() == 3;
+
+// select ... where (selected.text == "Alpha") -> the single "Alpha" text box
+alphaShapes = demo.shapesWithText("Alpha");
+assert alphaShapes != null;
+assert alphaShapes.size() == 1;
+assert alphaShapes.get(0).text == "Alpha";
+
+// A text that is present on no shape yields an empty result
+noneShapes = demo.shapesWithText("Nonexistent");
+assert noneShapes.size() == 0;

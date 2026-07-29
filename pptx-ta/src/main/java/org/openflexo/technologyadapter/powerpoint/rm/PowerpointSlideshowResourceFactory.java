@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2013 Openflexo
+ * (c) Copyright 2013-2025 Openflexo
  *
  * This file is part of OpenFlexo.
  *
@@ -23,23 +23,26 @@ package org.openflexo.technologyadapter.powerpoint.rm;
 import java.util.logging.Logger;
 
 import org.openflexo.foundation.resource.FlexoResourceCenter;
-import org.openflexo.foundation.resource.TechnologySpecificFlexoResourceFactory;
+import org.openflexo.foundation.resource.StreamIODelegate;
+import org.openflexo.foundation.resource.TechnologySpecificPamelaResourceFactory;
+import org.openflexo.foundation.technologyadapter.TechnologyContextManager;
 import org.openflexo.pamela.exceptions.ModelDefinitionException;
 import org.openflexo.technologyadapter.powerpoint.PowerpointTechnologyAdapter;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointModelFactory;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
 
 /**
  * Implementation of ResourceFactory for {@link PowerpointSlideshowResource}
- * 
+ *
  * @author sylvain
  *
  */
-public class PowerpointSlideshowResourceFactory
-		extends TechnologySpecificFlexoResourceFactory<PowerpointSlideshowResource, PowerpointSlideshow, PowerpointTechnologyAdapter> {
+public class PowerpointSlideshowResourceFactory extends TechnologySpecificPamelaResourceFactory<PowerpointSlideshowResource,
+		PowerpointSlideshow, PowerpointTechnologyAdapter, PowerpointModelFactory> {
 
+	@SuppressWarnings("unused")
 	private static final Logger logger = Logger.getLogger(PowerpointSlideshowResourceFactory.class.getPackage().getName());
 
-	public static String PPT_FILE_EXTENSION = ".ppt";
 	public static String PPTX_FILE_EXTENSION = ".pptx";
 
 	public PowerpointSlideshowResourceFactory() throws ModelDefinitionException {
@@ -48,24 +51,34 @@ public class PowerpointSlideshowResourceFactory
 
 	@Override
 	public PowerpointSlideshow makeEmptyResourceData(PowerpointSlideshowResource resource) {
-		return new PowerpointSlideshow(resource.getTechnologyAdapter());
+		if (resource.getIODelegate() instanceof StreamIODelegate) {
+			return resource.createOrLoadPowerpointSlideshow((StreamIODelegate<?>) resource.getIODelegate());
+		}
+		logger.severe("Cannot create PowerPoint slideshow for this io delegate: " + resource.getIODelegate());
+		return null;
 	}
 
 	@Override
 	public <I> boolean isValidArtefact(I serializationArtefact, FlexoResourceCenter<I> resourceCenter) {
-		return resourceCenter.retrieveName(serializationArtefact).endsWith(PPT_FILE_EXTENSION)
-				|| resourceCenter.retrieveName(serializationArtefact).endsWith(PPTX_FILE_EXTENSION);
+		return resourceCenter.retrieveName(serializationArtefact).endsWith(PPTX_FILE_EXTENSION)
+				&& !resourceCenter.retrieveName(serializationArtefact).startsWith("~");
 	}
 
 	@Override
 	public <I> PowerpointSlideshowResource registerResource(PowerpointSlideshowResource resource, FlexoResourceCenter<I> resourceCenter) {
 		super.registerResource(resource, resourceCenter);
 
-		// Register the resource in the PowerpointSlideshowRepository of supplied resource center
+		// Register the resource in the PowerpointSlideShowRepository of supplied resource center
 		registerResourceInResourceRepository(resource,
 				getTechnologyAdapter(resourceCenter.getServiceManager()).getPowerpointSlideShowRepository(resourceCenter));
 
 		return resource;
+	}
+
+	@Override
+	public PowerpointModelFactory makeModelFactory(PowerpointSlideshowResource resource,
+			TechnologyContextManager<PowerpointTechnologyAdapter> technologyContextManager) throws ModelDefinitionException {
+		return new PowerpointModelFactory(resource, technologyContextManager.getServiceManager().getEditingContext());
 	}
 
 }
