@@ -42,6 +42,7 @@ import java.lang.reflect.Type;
 import java.util.logging.Logger;
 
 import org.openflexo.foundation.fml.FlexoRole;
+import org.openflexo.foundation.fml.annotations.DeclareActorReferences;
 import org.openflexo.foundation.fml.annotations.DeclareEditionActions;
 import org.openflexo.foundation.fml.annotations.DeclareFetchRequests;
 import org.openflexo.foundation.fml.annotations.DeclareFlexoRoles;
@@ -49,6 +50,7 @@ import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.pamela.annotations.XMLElement;
+import org.openflexo.technologyadapter.powerpoint.fml.PowerpointActorReference;
 import org.openflexo.technologyadapter.powerpoint.fml.PowerpointShapeRole;
 import org.openflexo.technologyadapter.powerpoint.fml.PowerpointSlideRole;
 import org.openflexo.technologyadapter.powerpoint.fml.editionaction.AddPowerpointShape;
@@ -65,6 +67,7 @@ import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource
  * @author Vincent Leildé, Sylvain Guérin
  * 
  */
+@DeclareActorReferences({ PowerpointActorReference.class })
 @DeclareFlexoRoles({ PowerpointSlideRole.class, PowerpointShapeRole.class })
 @DeclareEditionActions({ AddPowerpointSlide.class, AddPowerpointShape.class })
 @DeclareFetchRequests({ SelectPowerpointSlide.class, SelectPowerpointShape.class })

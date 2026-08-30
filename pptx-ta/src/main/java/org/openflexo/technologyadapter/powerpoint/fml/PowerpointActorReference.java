@@ -45,11 +45,17 @@ import org.openflexo.foundation.fml.rt.ActorReference;
 import org.openflexo.foundation.fml.rt.ModelSlotInstance;
 import org.openflexo.logging.FlexoLogger;
 import org.openflexo.pamela.annotations.Getter;
+import org.openflexo.pamela.annotations.ImplementationClass;
+import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.pamela.annotations.PropertyIdentifier;
 import org.openflexo.pamela.annotations.Setter;
 import org.openflexo.pamela.annotations.XMLAttribute;
+import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointObject;
 
+@ModelEntity
+@ImplementationClass(PowerpointActorReference.PowerpointActorReferenceImpl.class)
+@XMLElement
 @FML("PowerpointActorReference")
 public interface PowerpointActorReference<T extends PowerpointObject> extends ActorReference<T> {
 
