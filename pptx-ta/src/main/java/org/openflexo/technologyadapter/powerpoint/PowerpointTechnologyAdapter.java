@@ -98,7 +98,8 @@ public class PowerpointTechnologyAdapter extends TechnologyAdapter<PowerpointTec
 		PowerpointSlideShowRepository<I> returned = resourceCenter.retrieveRepository(PowerpointSlideShowRepository.class, this);
 		if (returned == null) {
 			returned = PowerpointSlideShowRepository.instanciateNewRepository(this, resourceCenter);
-			resourceCenter.registerRepository(returned, PowerpointSlideShowRepository.class, this);
+			// Another thread may have registered one meanwhile: use the registered one (CORE-D-25)
+			returned = resourceCenter.registerRepository(returned, PowerpointSlideShowRepository.class, this);
 		}
 		return returned;
 	}
