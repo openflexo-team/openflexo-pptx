@@ -51,11 +51,11 @@ import org.openflexo.pamela.factory.PamelaModelFactory;
 import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource;
 
 /**
- * PDF factory for managing {@link PDFDocument}<br>
- * One instance of this class should be used for each {@link PowerpointWorkbookResource}
- * 
+ * PAMELA factory for managing {@link PowerpointSlideshow}.<br>
+ * One instance of this class should be used for each {@link PowerpointSlideshowResource}.
+ *
  * @author sylvain
- * 
+ *
  */
 public class PowerpointModelFactory extends PamelaModelFactory implements PamelaResourceModelFactory<PowerpointSlideshowResource> {
 
@@ -90,6 +90,26 @@ public class PowerpointModelFactory extends PamelaModelFactory implements Pamela
 
 	public PowerpointSlide makePowerpointSlide() {
 		return newInstance(PowerpointSlide.class);
+	}
+
+	public PowerpointTextBox makePowerpointTextBox() {
+		return newInstance(PowerpointTextBox.class);
+	}
+
+	public PowerpointAutoShape makePowerpointAutoShape() {
+		return newInstance(PowerpointAutoShape.class);
+	}
+
+	public PowerpointPicture makePowerpointPicture() {
+		return newInstance(PowerpointPicture.class);
+	}
+
+	public PowerpointLine makePowerpointLine() {
+		return newInstance(PowerpointLine.class);
+	}
+
+	public PowerpointShapeGroup makePowerpointShapeGroup() {
+		return newInstance(PowerpointShapeGroup.class);
 	}
 
 	@Override

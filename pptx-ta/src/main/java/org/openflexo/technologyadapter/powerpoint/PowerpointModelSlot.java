@@ -39,57 +39,34 @@
 package org.openflexo.technologyadapter.powerpoint;
 
 import java.lang.reflect.Type;
-import java.util.logging.Logger;
 
-import org.apache.poi.hslf.model.AutoShape;
-import org.apache.poi.hslf.model.Slide;
-import org.openflexo.foundation.fml.FlexoRole;
 import org.openflexo.foundation.technologyadapter.FreeModelSlot;
 import org.openflexo.pamela.annotations.Implementation;
 import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
 import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource;
 
-@ModelEntity
+/**
+ * Abstract base for PowerPoint model slots.<br>
+ * The concrete, FML-declared slot is {@link BasicPowerpointModelSlot}.
+ *
+ * @author Vincent Leildé, Sylvain Guérin
+ *
+ */
+@ModelEntity(isAbstract = true)
 public interface PowerpointModelSlot extends FreeModelSlot<PowerpointSlideshow, PowerpointSlideshowResource> {
 
 	@Implementation
 	public abstract class PowerpointModelSlotImpl implements PowerpointModelSlot {
 
-		private static final Logger logger = Logger.getLogger(PowerpointModelSlot.class.getPackage().getName());
-
-		@Override
-		public <PR extends FlexoRole<?>> String defaultFlexoRoleName(Class<PR> patternRoleClass) {
-			if (Slide.class.isAssignableFrom(patternRoleClass)) {
-				return "slide";
-			}
-			else if (AutoShape.class.isAssignableFrom(patternRoleClass)) {
-				return "shape";
-			}
-			logger.warning("Unexpected pattern property: " + patternRoleClass.getName());
-			return null;
-		}
-
 		@Override
 		public String getTypeDescription() {
 			return "Powerpoint Slide Show";
-		};
+		}
 
 		@Override
 		public Type getType() {
 			return PowerpointSlideshow.class;
-		}
-
-		@Override
-		public String getURIForObject(PowerpointSlideshow resourceData, Object o) {
-			// TODO
-			return null;
-		}
-
-		@Override
-		public Object retrieveObjectWithURI(PowerpointSlideshow resourceData, String objectURI) {
-			// TODO
-			return null;
 		}
 
 	}

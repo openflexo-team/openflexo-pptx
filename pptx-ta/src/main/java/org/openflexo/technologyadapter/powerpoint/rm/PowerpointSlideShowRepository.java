@@ -39,6 +39,8 @@
 
 package org.openflexo.technologyadapter.powerpoint.rm;
 
+import java.util.logging.Logger;
+
 import org.openflexo.foundation.resource.FlexoResourceCenter;
 import org.openflexo.foundation.technologyadapter.TechnologyAdapterResourceRepository;
 import org.openflexo.pamela.annotations.ModelEntity;
@@ -57,6 +59,8 @@ import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
 public interface PowerpointSlideShowRepository<I>
 		extends TechnologyAdapterResourceRepository<PowerpointSlideshowResource, PowerpointTechnologyAdapter, PowerpointSlideshow, I> {
 
+	static final Logger logger = Logger.getLogger(PowerpointSlideShowRepository.class.getPackage().getName());
+
 	public static <I> PowerpointSlideShowRepository<I> instanciateNewRepository(PowerpointTechnologyAdapter technologyAdapter,
 			FlexoResourceCenter<I> resourceCenter) {
 		PamelaModelFactory factory;
@@ -69,7 +73,7 @@ public interface PowerpointSlideShowRepository<I>
 			newRepository.getRootFolder().setRepositoryContext(null);
 			return newRepository;
 		} catch (ModelDefinitionException e) {
-			e.printStackTrace();
+			logger.log(java.util.logging.Level.WARNING, "Cannot instanciate PowerpointSlideShowRepository", e);
 		}
 		return null;
 	}

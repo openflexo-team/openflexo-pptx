@@ -41,11 +41,7 @@ package org.openflexo.technologyadapter.powerpoint.fml.editionaction;
 import java.lang.reflect.Type;
 import java.util.logging.Logger;
 
-import org.apache.poi.hslf.model.Slide;
-import org.apache.poi.hslf.usermodel.SlideShow;
 import org.openflexo.connie.DataBinding;
-import org.openflexo.connie.exception.NullReferenceException;
-import org.openflexo.connie.exception.TypeMismatchException;
 import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.foundation.fml.rt.RunTimeEvaluationContext;
 import org.openflexo.pamela.annotations.ImplementationClass;
@@ -81,42 +77,17 @@ public interface AddPowerpointSlide extends PowerpointAction<PowerpointSlide> {
 		@Override
 		public PowerpointSlide execute(RunTimeEvaluationContext evaluationContext) {
 
-			PowerpointSlide result = null;
-
 			PowerpointSlideshow receiver = getReceiver(evaluationContext);
 
-			if (receiver != null) {
-				try {
-					SlideShow ss = receiver.getSlideShow();
-					Slide slide = null;
-					if (ss != null) {
-						slide = ss.createSlide();
-						Integer slideIndex = getSlideIndex().getBindingValue(evaluationContext);
-						if (slideIndex != null) {
-							slide.setSlideNumber(slideIndex);
-						}
-
-						// Instanciate Wrapper.
-						result = receiver.getConverter().convertPowerpointSlideToSlide(slide, receiver, null);
-						receiver.addToPowerpointSlides(result);
-						receiver.setIsModified();
-					}
-					else {
-						logger.warning("Create a sheet requires a workbook");
-					}
-				} catch (TypeMismatchException e) {
-					e.printStackTrace();
-				} catch (NullReferenceException e) {
-					e.printStackTrace();
-				} catch (ReflectiveOperationException e) {
-					e.printStackTrace();
-				}
-			}
-			else {
-				logger.warning("Model slot not correctly initialised : model is null");
+			if (receiver == null) {
+				logger.warning("Model slot not correctly initialised : slideshow is null");
 				return null;
 			}
 
+			// XSLF appends the new slide at the end of the presentation ; positional insertion
+			// (getSlideIndex()) is not yet supported and left as a known issue.
+			PowerpointSlide result = receiver.addSlide();
+			receiver.setIsModified();
 			return result;
 		}
 

@@ -1,0 +1,28 @@
+use org.openflexo.technologyadapter.powerpoint.BasicPowerpointModelSlot as PPT;
+
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
+import java.util.List;
+
+@URI("http://openflexo.org/ppt-test/TestResourceCenter/FML/PowerpointDemo.fml")
+public model PowerpointDemo {
+
+    public PowerpointSlideshow slideshow with PPT::BasicPowerpointModelSlot();
+
+    create(required Resource<PowerpointSlideshow> resource) {
+        connect slideshow using parameters.resource;
+    }
+
+    public List<PowerpointSlide> allSlides() {
+        return select PowerpointSlide from (slideshow);
+    }
+
+    public List<PowerpointShape> allShapes() {
+        return select PowerpointShape from (slideshow);
+    }
+
+    public List<PowerpointShape> shapesWithText(String searched) {
+        return select PowerpointShape from (slideshow) where (selected.text == parameters.searched);
+    }
+}

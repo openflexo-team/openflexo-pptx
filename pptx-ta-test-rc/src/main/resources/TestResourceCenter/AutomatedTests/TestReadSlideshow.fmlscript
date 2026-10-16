@@ -1,0 +1,25 @@
+// Use case: open an existing .pptx presentation and navigate its slides and shapes.
+// Sample.pptx contains 2 slides:
+//   - slide 0: a title placeholder "OpenFlexo PowerPoint TA"
+//   - slide 1: two text boxes "Alpha" and "Beta"
+
+ppt = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Sample.pptx"];
+assert ppt != null;
+assert ppt.powerpointSlides.size() == 2;
+
+// First slide: a single (title) shape
+slide0 = ppt.powerpointSlides.get(0);
+assert slide0 != null;
+assert slide0.slideNumber == 0;
+assert slide0.title == "OpenFlexo PowerPoint TA";
+assert slide0.powerpointShapes.size() == 1;
+assert slide0.powerpointShapes.get(0).text == "OpenFlexo PowerPoint TA";
+
+// Second slide: two text boxes, no title
+slide1 = ppt.powerpointSlides.get(1);
+assert slide1 != null;
+assert slide1.slideNumber == 1;
+assert slide1.title == null;
+assert slide1.powerpointShapes.size() == 2;
+assert slide1.powerpointShapes.get(0).text == "Alpha";
+assert slide1.powerpointShapes.get(1).text == "Beta";

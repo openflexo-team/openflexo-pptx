@@ -44,15 +44,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 
-import org.apache.poi.hslf.model.Slide;
-import org.apache.poi.hslf.usermodel.SlideShow;
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.openflexo.ApplicationContext;
 import org.openflexo.components.wizard.WizardStep;
 import org.openflexo.gina.annotation.FIBPanel;
@@ -79,10 +78,10 @@ public class ChoosePPTSlide extends WizardStep {
 	private String diagramName;
 	private String diagramTitle;
 
-	private SlideShow selectedSlideShow;
-	private ArrayList<Slide> currentSlides;
+	private XMLSlideShow selectedSlideShow;
+	private ArrayList<XSLFSlide> currentSlides;
 	private File file;
-	private Slide slide;
+	private XSLFSlide slide;
 
 	public ChoosePPTSlide(FlexoController controller) {
 		this.controller = controller;
@@ -131,21 +130,19 @@ public class ChoosePPTSlide extends WizardStep {
 
 	public void loadSlideShow() {
 		try (FileInputStream fis = new FileInputStream(getFile())) {
-			selectedSlideShow = new SlideShow(fis);
+			selectedSlideShow = new XMLSlideShow(fis);
 			if (currentSlides == null) {
 				currentSlides = new ArrayList<>();
 			}
 			else {
 				currentSlides.clear();
 			}
-			for (Slide slide : selectedSlideShow.getSlides()) {
+			for (XSLFSlide slide : selectedSlideShow.getSlides()) {
 				currentSlides.add(slide);
 			}
 			getPropertyChangeSupport().firePropertyChange("selectedSlideShow", null, selectedSlideShow);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.log(java.util.logging.Level.WARNING, "Cannot load PowerPoint file " + getFile(), e);
 		}
 	}
 
@@ -168,15 +165,15 @@ public class ChoosePPTSlide extends WizardStep {
 		}
 	}
 
-	public SlideShow getSelectedSlideShow() {
+	public XMLSlideShow getSelectedSlideShow() {
 		return selectedSlideShow;
 	}
 
-	public Slide getSlide() {
+	public XSLFSlide getSlide() {
 		return slide;
 	}
 
-	public void setSlide(Slide slide) {
+	public void setSlide(XSLFSlide slide) {
 
 		boolean wasValid = isValid();
 		this.slide = slide;
@@ -187,19 +184,19 @@ public class ChoosePPTSlide extends WizardStep {
 		checkValidity();
 	}
 
-	public ArrayList<Slide> getCurrentSlides() {
+	public ArrayList<XSLFSlide> getCurrentSlides() {
 		return currentSlides;
 	}
 
-	public ImageIcon getMiniature(Slide s) {
+	public ImageIcon getMiniature(XSLFSlide s) {
 		return getScreenShot(s, 75);
 	}
 
-	public ImageIcon getOverview(Slide s) {
+	public ImageIcon getOverview(XSLFSlide s) {
 		return getScreenShot(s, 400);
 	}
 
-	public ImageIcon getScreenShot(Slide s, double size) {
+	public ImageIcon getScreenShot(XSLFSlide s, double size) {
 		if (s != null && s.getSlideShow() != null) {
 			try {
 				Dimension d = s.getSlideShow().getPageSize();

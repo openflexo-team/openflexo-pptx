@@ -72,7 +72,7 @@ public class PowerpointSlideView extends JPanel {
 		this.slide = slide;
 		this.controller = controller;
 		slidePane = new PowerpointSlidePane(slide);
-		Dimension dimension = slide.getSlideshow().getSlideShow().getPageSize();
+		Dimension dimension = slide.getPowerpointSlideshow().getSlideShow().getPageSize();
 		slidePane.setPreferredSize(dimension);
 
 		JScrollPane pan = new JScrollPane(slidePane);

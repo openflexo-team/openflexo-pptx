@@ -1,15 +1,8 @@
 dependencies {
   // openflexo dep
   implementation flexoFoundation()
-  // external dep
-  implementation group: 'org.apache.poi', name: 'poi', version: '3.12'
-  api group: 'org.apache.poi', name: 'poi-scratchpad', version: '3.12'
-  //    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '3.12'
-
-  // testing dep
-  testImplementation flexoFoundationTest()
-
-  // Test resource center
-  testRuntimeOnly project(':pptx-ta-test-rc')
+  // external dep (aligned with openflexo-xlsx to avoid classpath conflicts in the openflexo-dev composite)
+  api group: 'org.apache.poi', name: 'poi', version: '3.17'
+  api group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17'
 
 }

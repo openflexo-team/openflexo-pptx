@@ -1,0 +1,14 @@
+dependencies {
+    implementation project(':pptx-ta')
+    implementation flexoFoundation()
+
+    // testing dep
+    implementation testUtils()
+    testImplementation flexoFoundation()
+    implementation flexoFoundationTest()
+    testImplementation fmlCli()
+    testImplementation fmlCliTest()
+
+    // Test resource center
+    testRuntimeOnly project(':pptx-ta-test-rc')
+}

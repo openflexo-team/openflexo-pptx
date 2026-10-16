@@ -1,0 +1,19 @@
+// Use case: open a presentation and enrich it in memory (add a slide, add a text box).
+// This exercises the write API of the PowerPoint model (backed by POI XSLF) through FML.
+
+ppt = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Sample.pptx"];
+assert ppt != null;
+assert ppt.powerpointSlides.size() == 2;
+
+// Append a new (empty) slide
+newSlide = ppt.addSlide();
+assert newSlide != null;
+assert ppt.powerpointSlides.size() == 3;
+assert newSlide.powerpointShapes.size() == 0;
+
+// Add a text box to the freshly created slide
+box = newSlide.addTextBox("Gamma", 40.0, 40.0, 200.0, 40.0);
+assert box != null;
+assert box.text == "Gamma";
+assert newSlide.powerpointShapes.size() == 1;
+assert newSlide.powerpointShapes.get(0).text == "Gamma";

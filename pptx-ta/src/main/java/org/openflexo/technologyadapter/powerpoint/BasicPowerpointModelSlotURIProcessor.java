@@ -138,8 +138,7 @@ public interface BasicPowerpointModelSlotURIProcessor extends FlexoConceptObject
 			try {
 				builtURI = URLEncoder.encode(powerpointObject.getUri(), "UTF-8");
 			} catch (UnsupportedEncodingException e) {
-				logger.warning("Cannot process URI - Unexpected encoding error");
-				e.printStackTrace();
+				logger.log(java.util.logging.Level.WARNING, "Cannot process URI - Unexpected encoding error", e);
 			}
 
 			if (builtURI != null) {
