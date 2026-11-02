@@ -38,23 +38,46 @@
 
 package org.openflexo.technologyadapter.powerpoint.view;
 
+import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
+import org.apache.poi.sl.draw.DrawBackground;
+import org.apache.poi.sl.draw.DrawConnectorShape;
 import org.apache.poi.sl.draw.DrawFactory;
+import org.apache.poi.sl.draw.DrawFreeformShape;
 import org.apache.poi.sl.draw.DrawGraphicalFrame;
 import org.apache.poi.sl.draw.DrawShape;
+import org.apache.poi.sl.draw.DrawTextBox;
+import org.apache.poi.sl.draw.DrawTextShape;
 import org.apache.poi.sl.draw.Drawable;
+import org.apache.poi.sl.draw.geom.Outline;
+import org.apache.poi.sl.usermodel.Background;
+import org.apache.poi.sl.usermodel.ConnectorShape;
+import org.apache.poi.sl.usermodel.FreeformShape;
 import org.apache.poi.sl.usermodel.GraphicalFrame;
+import org.apache.poi.sl.usermodel.TextBox;
+import org.apache.poi.sl.usermodel.TextShape;
+import org.apache.poi.xslf.usermodel.XSLFBackground;
+import org.apache.poi.xslf.usermodel.XSLFShape;
+import org.apache.xmlbeans.XmlObject;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointChart;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShapeGroup;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
 
 /**
- * POI draw factory that draws the charts of a slide with {@link PowerpointChartRenderer}: POI itself only draws the fallback picture of a
- * graphic frame, which presentations rarely carry.<br>
+ * POI draw factory completing what POI does not render:
+ * <ul>
+ * <li>the charts of a slide, drawn with {@link PowerpointChartRenderer}: POI itself only draws the fallback picture of a graphic frame,
+ * which presentations rarely carry;</li>
+ * <li>the pattern fills of the backgrounds and of the shapes, painted with {@link PowerpointPatternFill}: POI ignores them.</li>
+ * </ul>
  * Install it on a graphics before drawing the slide with {@link #install(Graphics2D, PowerpointSlide)}: charts are then drawn at their
  * place in z-order, inside groups as well.
  * 
@@ -95,6 +118,103 @@ public class PowerpointDrawFactory extends DrawFactory {
 				}
 			}
 		};
+	}
+
+	@Override
+	public DrawBackground getDrawable(Background<?, ?> background) {
+		return new DrawBackground(background) {
+			@Override
+			public void draw(Graphics2D graphics) {
+				XmlObject patternFill = PowerpointPatternFill.findPatternFill(((XSLFBackground) getShape()).getXmlObject(), "bgPr");
+				if (patternFill == null) {
+					super.draw(graphics);
+					return;
+				}
+				Dimension page = getShape().getSheet().getSlideShow().getPageSize();
+				Paint oldPaint = graphics.getPaint();
+				graphics.setPaint(PowerpointPatternFill.makePaint(patternFill, graphics));
+				graphics.fill(new Rectangle2D.Double(0, 0, page.getWidth(), page.getHeight()));
+				graphics.setPaint(oldPaint);
+			}
+		};
+	}
+
+	@Override
+	public DrawTextBox getDrawable(TextBox<?, ?> shape) {
+		return new DrawTextBox(shape) {
+			@Override
+			public void draw(Graphics2D graphics) {
+				if (getAnchor(graphics, getShape()) != null) {
+					fillWithPattern(getShape(), graphics, g -> computeOutlines(g));
+				}
+				super.draw(graphics);
+			}
+		};
+	}
+
+	@Override
+	public DrawFreeformShape getDrawable(FreeformShape<?, ?> shape) {
+		return new DrawFreeformShape(shape) {
+			@Override
+			public void draw(Graphics2D graphics) {
+				if (getAnchor(graphics, getShape()) != null) {
+					fillWithPattern(getShape(), graphics, g -> computeOutlines(g));
+				}
+				super.draw(graphics);
+			}
+		};
+	}
+
+	@Override
+	public DrawTextShape getDrawable(TextShape<?, ?> shape) {
+		return new DrawTextShape(shape) {
+			@Override
+			public void draw(Graphics2D graphics) {
+				if (getAnchor(graphics, getShape()) != null) {
+					fillWithPattern(getShape(), graphics, g -> computeOutlines(g));
+				}
+				super.draw(graphics);
+			}
+		};
+	}
+
+	@Override
+	public DrawConnectorShape getDrawable(ConnectorShape<?, ?> shape) {
+		return new DrawConnectorShape(shape) {
+			@Override
+			public void draw(Graphics2D graphics) {
+				if (getAnchor(graphics, getShape()) != null) {
+					fillWithPattern(getShape(), graphics, g -> computeOutlines(g));
+				}
+				super.draw(graphics);
+			}
+		};
+	}
+
+	/**
+	 * Fill the outline of the shape with its pattern, when it is filled with a pattern. POI then draws the rest of the shape (its text
+	 * and its outline): it finds no fill style for a pattern, so it does not fill the shape again.<br>
+	 * The outlines are supplied by a lambda calling the protected computeOutlines() of POI: the Eclipse compiler does not accept a method
+	 * reference to it.
+	 */
+	private static void fillWithPattern(Object shape, Graphics2D graphics, Function<Graphics2D, Collection<Outline>> outlines) {
+		if (!(shape instanceof XSLFShape)) {
+			return;
+		}
+		XmlObject patternFill = PowerpointPatternFill.findPatternFill(((XSLFShape) shape).getXmlObject(), "spPr");
+		if (patternFill == null) {
+			return;
+		}
+		Path2D area = new Path2D.Double();
+		for (Outline outline : outlines.apply(graphics)) {
+			if (outline.getPath().isFilled()) {
+				area.append(outline.getOutline(), false);
+			}
+		}
+		Paint oldPaint = graphics.getPaint();
+		graphics.setPaint(PowerpointPatternFill.makePaint(patternFill, graphics));
+		graphics.fill(area);
+		graphics.setPaint(oldPaint);
 	}
 
 	private static PowerpointChart findChart(List<PowerpointShape> shapes, GraphicalFrame<?, ?> frame) {
