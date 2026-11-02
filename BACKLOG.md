@@ -121,3 +121,20 @@ drawn as defined).
 **Limits.** A simplified rendering: no number formats, fonts, gradients, effects, stacked groupings, data tables or
 trend lines; scheme colors fall back to the default Office palette (the sample decks only use explicit colors).
 
+### PPTX-F-4 — Paint the pattern fills  ·  `DONE`
+
+**Problem.** POI does not paint pattern fills (`a:pattFill`): it only knows solid, picture, gradient and theme fills,
+and silently leaves a pattern unpainted. The sample decks hold 33 of them: the blue grid background of every slide of
+NordicEBikes (whose white texts were then invisible, PPTX-D-2), the diagonal hatchings of some of its shapes, the
+hazard bands of ShipFast and the target boxes of TalentLens.
+
+**Done.** `PowerpointPatternFill` builds a `TexturePaint` from a preset pattern (8x8 tile, foreground and background
+colors; a pattern pixel is a device pixel, as in PowerPoint) — grids, horizontal, vertical and diagonal lines, crosses,
+checks and percentages; the other presets fall back to an even mix of both colors. `PowerpointDrawFactory` paints it for
+backgrounds (`DrawBackground`) and shapes (text boxes, auto-shapes, freeforms, connectors: the outline is filled with
+the pattern, then POI draws the rest of the shape), in the slide view and the thumbnails.
+
+**Checked.** The slides of the three decks rendered: blue grid of NordicEBikes, hatchings of ShipFast and TalentLens.
+
+**Limits.** Pattern fills of table cells and theme or scheme colors of patterns are not handled (none in the samples).
+

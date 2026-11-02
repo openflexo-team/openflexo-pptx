@@ -13,7 +13,8 @@ POI 3.17), a PAMELA `@ModelEntity` model, a modern `PamelaResource` layer, and d
   the speaker notes of the slides — everything the sample decks of `pptx-ta-test-rc` contain. Not reflected: SmartArt,
   OLE objects, media, ink (absent from the samples; skipped, logged at FINE), the paragraphs of table cells (a cell
   only exposes its text), slide masters, layouts and themes (only `layoutName`). POI does not render charts (it only
-  draws the fallback picture of a graphic frame): they are drawn by our own Java2D renderer, see PPTX-F-3.
+  draws the fallback picture of a graphic frame): they are drawn by our own Java2D renderer, see PPTX-F-3. POI does
+  not paint pattern fills either: they are painted by `PowerpointPatternFill`, see PPTX-F-4.
 - **Nested elements are not listed at the top level.** The shapes of a group are listed in
   `PowerpointShapeGroup.children`, not in `PowerpointSlide.powerpointShapes` (nor in `select … from slideshow`).
 - **Labels of connectors are separate text boxes.** Nothing in the file links a label such as "REST API" to its
