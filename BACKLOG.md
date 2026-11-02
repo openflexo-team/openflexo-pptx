@@ -101,3 +101,23 @@ with notes; the slide view is built without error for the 106 slides.
 
 **Left.** See `KNOWN_ISSUES.md` (paragraphs of table cells, masters and layouts, labels of connectors) and PPTX-D-1.
 
+### PPTX-F-3 — Draw the charts  ·  `DONE`
+
+**Problem.** POI does not render charts: for a graphic frame it only draws the fallback picture that some editors join
+(`mc:Fallback`), which none of the sample decks carries. Charts were blank in the slide view and in the thumbnails.
+
+**Done.** `PowerpointChartRenderer` draws a chart with Java2D from the series of the model: column, bar, line and their
+combinations (one value scale per kind of chart, on the left and right axes, or shared when they use the same axis),
+pie, doughnut (hole size) and radar (filled or not). It follows the series and point colors, the value labels, the
+legend position (wrapped in rows), the visibility and bounds of the value axes, the text color and the plot area fill
+of the chart. `PowerpointDrawFactory` plugs it into POI (through the `Drawable.DRAW_FACTORY` rendering hint), so that
+`XSLFSlide.draw()` draws the charts at their place in z-order, inside groups as well, both in the slide view and in
+the thumbnails. The model gained `PowerpointChart.legendPosition` / `textColor` / `plotAreaColor` and
+`PowerpointChartSeries.color` / `lineColor` / `pointColors` / `showValues`.
+
+**Checked.** The 12 charts of the sample decks rendered and compared with their data (the white line of PPTX-D-2 is
+drawn as defined).
+
+**Limits.** A simplified rendering: no number formats, fonts, gradients, effects, stacked groupings, data tables or
+trend lines; scheme colors fall back to the default Office palette (the sample decks only use explicit colors).
+

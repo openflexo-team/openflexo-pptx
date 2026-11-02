@@ -38,6 +38,7 @@
 
 package org.openflexo.technologyadapter.powerpoint.model;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -57,6 +58,7 @@ import org.openflexo.pamela.annotations.PropertyIdentifier;
 import org.openflexo.pamela.annotations.Remover;
 import org.openflexo.pamela.annotations.Setter;
 import org.openflexo.pamela.annotations.XMLElement;
+import org.openxmlformats.schemas.drawingml.x2006.chart.CTLegend;
 
 /**
  * Represents a chart of a slide: a graphic frame holding a POI {@link XSLFChart}
@@ -114,6 +116,27 @@ public interface PowerpointChart extends PowerpointShape {
 	public String getChartType();
 
 	/**
+	 * Return the position of the legend of this chart ("bottom", "top", "left", "right" or "top right"), or null when it has none
+	 *
+	 * @return
+	 */
+	public String getLegendPosition();
+
+	/**
+	 * Return the color of the texts of this chart (axes, legend, labels), or null when it is not given explicitly
+	 *
+	 * @return
+	 */
+	public Color getTextColor();
+
+	/**
+	 * Return the solid fill of the plot area of this chart, or null when it has none
+	 *
+	 * @return
+	 */
+	public Color getPlotAreaColor();
+
+	/**
 	 * Return the series with the supplied name, or null
 	 *
 	 * @param name
@@ -167,6 +190,46 @@ public interface PowerpointChart extends PowerpointShape {
 				}
 			}
 			return returned.length() > 0 ? returned.toString() : null;
+		}
+
+		@Override
+		public String getLegendPosition() {
+			if (getChart() == null || !getChart().getCTChart().isSetLegend()) {
+				return null;
+			}
+			CTLegend legend = getChart().getCTChart().getLegend();
+			if (!legend.isSetLegendPos() || legend.getLegendPos().getVal() == null) {
+				// The default position of a legend is on the right
+				return "right";
+			}
+			switch (legend.getLegendPos().getVal().toString()) {
+				case "b":
+					return "bottom";
+				case "t":
+					return "top";
+				case "l":
+					return "left";
+				case "tr":
+					return "top right";
+				default:
+					return "right";
+			}
+		}
+
+		@Override
+		public Color getTextColor() {
+			if (getChart() == null || !getChart().getCTChartSpace().isSetTxPr()) {
+				return null;
+			}
+			return PowerpointXmlUtils.toColor(PowerpointXmlUtils.findAttribute(getChart().getCTChartSpace().getTxPr(), "srgbClr", "val"));
+		}
+
+		@Override
+		public Color getPlotAreaColor() {
+			if (getChart() == null || getChart().getCTChart().getPlotArea() == null || !getChart().getCTChart().getPlotArea().isSetSpPr()) {
+				return null;
+			}
+			return PowerpointXmlUtils.solidFillColor(getChart().getCTChart().getPlotArea().getSpPr());
 		}
 
 		@Override

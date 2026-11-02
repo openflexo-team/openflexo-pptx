@@ -51,12 +51,8 @@ import javax.swing.KeyStroke;
 import org.openflexo.diana.DianaCoreUtils;
 import org.openflexo.diana.Drawing.ContainerNode;
 import org.openflexo.diana.Drawing.DrawingTreeNode;
-import org.openflexo.diana.Drawing.ShapeNode;
 import org.openflexo.diana.swing.control.SwingToolFactory;
 import org.openflexo.selection.SelectionManagingDianaEditor;
-import org.openflexo.technologyadapter.powerpoint.model.PowerpointChart;
-import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
-import org.openflexo.technologyadapter.powerpoint.model.PowerpointShapeGroup;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
 import org.openflexo.view.controller.FlexoController;
 
@@ -74,7 +70,6 @@ public class PowerpointSlideEditor extends SelectionManagingDianaEditor<Powerpoi
 	public PowerpointSlideEditor(PowerpointSlide slide, FlexoController controller) {
 		super(new PowerpointSlideDrawing(slide), controller != null ? controller.getSelectionManager() : null, DianaCoreUtils.TOOLS_FACTORY,
 				SwingToolFactory.DEFAULT);
-		installChartPlaceholders(slide.getPowerpointShapes());
 		InputMap inputMap = getDrawingView().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "select_container");
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "select_first_child");
@@ -90,23 +85,6 @@ public class PowerpointSlideEditor extends SelectionManagingDianaEditor<Powerpoi
 				selectFirstChild();
 			}
 		});
-	}
-
-	/**
-	 * POI does not render charts: paint a placeholder in their Diana shape
-	 * 
-	 * @param shapes
-	 */
-	private void installChartPlaceholders(List<PowerpointShape> shapes) {
-		for (PowerpointShape shape : shapes) {
-			Object node = getDrawing().getDrawingTreeNode(shape);
-			if (shape instanceof PowerpointChart && node instanceof ShapeNode) {
-				((ShapeNode<?>) node).setShapePainter(new PowerpointChartPlaceholderPainter((PowerpointChart) shape));
-			}
-			else if (shape instanceof PowerpointShapeGroup) {
-				installChartPlaceholders(((PowerpointShapeGroup) shape).getChildren());
-			}
-		}
 	}
 
 	/**

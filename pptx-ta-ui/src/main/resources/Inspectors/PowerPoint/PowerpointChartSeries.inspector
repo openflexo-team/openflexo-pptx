@@ -21,6 +21,10 @@
 				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1302;location=left)" />
 			<TextArea index="1302" data="data.dataText" readOnly="true" rows="8" columns="10" localize="true" name="Data"
 				constraints="twocols(expandHorizontally=true;expandVertically=true;index=1302;location=right)" />
+			<Label label="color" index="1303" localize="true" name="SeriesColorLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1303;location=left)" />
+			<Color index="1303" data="data.color" readOnly="true" localize="true" name="SeriesColor"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1303;location=right)" />
 		</Tab>
 	</TabPanel>
 	<LocalizedDictionary>
@@ -31,6 +35,8 @@
 		<Localized key="points" lang="French" value="points" />
 		<Localized key="data" lang="English" value="data" />
 		<Localized key="data" lang="French" value="données" />
+		<Localized key="color" lang="English" value="color" />
+		<Localized key="color" lang="French" value="couleur" />
 	</LocalizedDictionary>
 	<Parameter name="title" value="Chart series" />
 </Panel>

@@ -23,3 +23,13 @@ shape the connector is glued to), but another tool may resolve them differently.
 
 **Fix.** In the generator of the sample decks: give the slide number placeholder and the tables free ids, then
 regenerate the decks (their `.expected.md` stay valid).
+
+### PPTX-D-2 — Invisible cumulative line in the Pareto chart of NordicEBikes  ·  `TODO`
+
+**Symptom.** In `NordicEBikes-Design-Review-DR2.pptx`, slide 8, the "Cumulative %" line series of the defect Pareto is
+white (line and markers), on a chart and a plot area without fill, over a white slide: it is only visible where it
+crosses the columns. The slide view draws it as the file defines it.
+
+**Fix.** In the generator of the sample decks: give the line a visible color (or the plot area a dark fill), then
+regenerate the deck.
+

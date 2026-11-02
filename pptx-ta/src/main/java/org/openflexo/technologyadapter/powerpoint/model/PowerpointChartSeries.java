@@ -38,11 +38,19 @@
 
 package org.openflexo.technologyadapter.powerpoint.model;
 
+import static org.openflexo.technologyadapter.powerpoint.model.PowerpointXmlUtils.CHART_NAMESPACE;
+import static org.openflexo.technologyadapter.powerpoint.model.PowerpointXmlUtils.findAttribute;
+import static org.openflexo.technologyadapter.powerpoint.model.PowerpointXmlUtils.firstChild;
+import static org.openflexo.technologyadapter.powerpoint.model.PowerpointXmlUtils.lineColor;
+import static org.openflexo.technologyadapter.powerpoint.model.PowerpointXmlUtils.solidFillColor;
+
+import java.awt.Color;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 import org.apache.poi.xddf.usermodel.chart.XDDFBarChartData;
 import org.apache.poi.xddf.usermodel.chart.XDDFChartData;
@@ -129,6 +137,35 @@ public interface PowerpointChartSeries extends PowerpointSlideElement {
 	 * @return
 	 */
 	public Double getValue(String category);
+
+	/**
+	 * Return the color of this series (its solid fill, or its line for a line series), or null when it is not given explicitly
+	 *
+	 * @return
+	 */
+	public Color getColor();
+
+	/**
+	 * Return the color of the line of this series (for a line or radar series), or its fill color when it has no line color
+	 *
+	 * @return
+	 */
+	public Color getLineColor();
+
+	/**
+	 * Return the colors given to the points of this series (the slices of a pie, for instance), in the order of its categories, with
+	 * null for a point without its own color
+	 *
+	 * @return
+	 */
+	public List<Color> getPointColors();
+
+	/**
+	 * Return whether the values of this series are shown as labels on the chart
+	 *
+	 * @return
+	 */
+	public boolean isShowValues();
 
 	/**
 	 * Return the points of this series as text, one "category: value" per line
@@ -282,6 +319,61 @@ public interface PowerpointChartSeries extends PowerpointSlideElement {
 			int index = getCategories().indexOf(category);
 			List<Double> values = getValues();
 			return index >= 0 && index < values.size() ? values.get(index) : null;
+		}
+
+		/**
+		 * Return the XML element of this series (c:ser), the parent of its values
+		 */
+		private XmlObject getSeriesXml() {
+			Object values = invokeSeriesAccessor("getNumDS");
+			if (!(values instanceof XmlObject)) {
+				return null;
+			}
+			try (XmlCursor cursor = ((XmlObject) values).newCursor()) {
+				return cursor.toParent() ? cursor.getObject() : null;
+			}
+		}
+
+		@Override
+		public Color getColor() {
+			XmlObject shapeProperties = firstChild(getSeriesXml(), CHART_NAMESPACE, "spPr");
+			Color fill = solidFillColor(shapeProperties);
+			return fill != null ? fill : lineColor(shapeProperties);
+		}
+
+		@Override
+		public Color getLineColor() {
+			XmlObject shapeProperties = firstChild(getSeriesXml(), CHART_NAMESPACE, "spPr");
+			Color line = lineColor(shapeProperties);
+			return line != null ? line : solidFillColor(shapeProperties);
+		}
+
+		@Override
+		public List<Color> getPointColors() {
+			List<Color> returned = new ArrayList<>();
+			for (int i = 0; i < getValues().size(); i++) {
+				returned.add(null);
+			}
+			XmlObject series = getSeriesXml();
+			if (series != null) {
+				for (XmlObject point : series.selectChildren(CHART_NAMESPACE, "dPt")) {
+					String index = findAttribute(point, "idx", "val");
+					try {
+						int i = Integer.parseInt(index);
+						if (i >= 0 && i < returned.size()) {
+							returned.set(i, solidFillColor(firstChild(point, CHART_NAMESPACE, "spPr")));
+						}
+					} catch (NumberFormatException e) {
+						// Ignore a point without index
+					}
+				}
+			}
+			return returned;
+		}
+
+		@Override
+		public boolean isShowValues() {
+			return "1".equals(findAttribute(firstChild(getSeriesXml(), CHART_NAMESPACE, "dLbls"), "showVal", "val"));
 		}
 
 		@Override

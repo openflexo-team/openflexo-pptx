@@ -200,6 +200,7 @@ public class PowerpointSlideThumbnailsPanel extends JPanel {
 			g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 			g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 			g.scale(scale, scale);
+			PowerpointDrawFactory.install(g, slide);
 			slide.getSlide().draw(g);
 		} catch (RuntimeException e) {
 			// POI may fail on some contents: keep a blank thumbnail

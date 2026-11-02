@@ -81,7 +81,8 @@ import org.openflexo.technologyadapter.powerpoint.model.PowerpointTableRow;
  * Diana drawing representing a {@link PowerpointSlide}.<br>
  * 
  * POI keeps rendering the slide: the whole slide is painted by a {@link DrawingDecorationPainter}, so that rendering is exactly the one
- * of {@link org.apache.poi.xslf.usermodel.XSLFSlide#draw(Graphics2D)}. Each element of the slide is then represented by a transparent,
+ * of {@link org.apache.poi.xslf.usermodel.XSLFSlide#draw(Graphics2D)}, completed with the charts that POI does not draw (see
+ * {@link PowerpointDrawFactory}). Each element of the slide is then represented by a transparent,
  * read-only Diana shape covering its bounds, which gives focus and selection without changing what is displayed. Diana shapes are nested
  * as the elements are: the shapes of a {@link PowerpointShapeGroup} in the shape of the group, the rows of a {@link PowerpointTable} in
  * the shape of the table, and the cells in their row.
@@ -363,6 +364,7 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 				g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 				g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 				g2.scale(g.getScale(), g.getScale());
+				PowerpointDrawFactory.install(g2, getModel());
 				getModel().getSlide().draw(g2);
 			} catch (RuntimeException e) {
 				// POI may fail on some contents (comments, unsupported parts): do not break the whole view
