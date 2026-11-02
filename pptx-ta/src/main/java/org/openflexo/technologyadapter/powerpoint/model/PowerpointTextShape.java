@@ -38,10 +38,24 @@
 
 package org.openflexo.technologyadapter.powerpoint.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
+import org.openflexo.pamela.annotations.Adder;
+import org.openflexo.pamela.annotations.CloningStrategy;
+import org.openflexo.pamela.annotations.CloningStrategy.StrategyType;
+import org.openflexo.pamela.annotations.Embedded;
+import org.openflexo.pamela.annotations.Getter;
+import org.openflexo.pamela.annotations.Getter.Cardinality;
 import org.openflexo.pamela.annotations.ModelEntity;
+import org.openflexo.pamela.annotations.PastingPoint;
+import org.openflexo.pamela.annotations.PropertyIdentifier;
+import org.openflexo.pamela.annotations.Remover;
+import org.openflexo.pamela.annotations.Setter;
+import org.openflexo.pamela.annotations.XMLElement;
 
 /**
  * Represents a PowerPoint shape carrying text (backed by a POI XSLFTextShape).
@@ -51,6 +65,38 @@ import org.openflexo.pamela.annotations.ModelEntity;
  */
 @ModelEntity(isAbstract = true)
 public interface PowerpointTextShape extends PowerpointSimpleShape {
+
+	@PropertyIdentifier(type = PowerpointParagraph.class, cardinality = Cardinality.LIST)
+	public static final String PARAGRAPHS_KEY = "paragraphs";
+
+	/**
+	 * Return the paragraphs of the text of this shape
+	 *
+	 * @return
+	 */
+	@Getter(value = PARAGRAPHS_KEY, cardinality = Cardinality.LIST, inverse = PowerpointParagraph.TEXT_SHAPE_KEY)
+	@XMLElement
+	@Embedded
+	@CloningStrategy(StrategyType.CLONE)
+	public List<PowerpointParagraph> getParagraphs();
+
+	@Setter(PARAGRAPHS_KEY)
+	public void setParagraphs(List<PowerpointParagraph> paragraphs);
+
+	@Adder(PARAGRAPHS_KEY)
+	@PastingPoint
+	public void addToParagraphs(PowerpointParagraph aParagraph);
+
+	@Remover(PARAGRAPHS_KEY)
+	public void removeFromParagraphs(PowerpointParagraph aParagraph);
+
+	/**
+	 * Build the paragraphs of this shape again from the text of the underlying POI shape
+	 *
+	 * @param factory
+	 *            the factory used to create the paragraphs
+	 */
+	public void updateParagraphs(PowerpointModelFactory factory);
 
 	/**
 	 * Return the text held by this shape
@@ -78,6 +124,20 @@ public interface PowerpointTextShape extends PowerpointSimpleShape {
 		private static final Logger logger = Logger.getLogger(PowerpointTextShapeImpl.class.getPackage().getName());
 
 		@Override
+		public void updateParagraphs(PowerpointModelFactory factory) {
+			for (PowerpointParagraph paragraph : new ArrayList<>(getParagraphs())) {
+				removeFromParagraphs(paragraph);
+			}
+			if (getShape() instanceof XSLFTextShape) {
+				for (XSLFTextParagraph poiParagraph : ((XSLFTextShape) getShape()).getTextParagraphs()) {
+					PowerpointParagraph paragraph = factory.makePowerpointParagraph();
+					paragraph.setParagraph(poiParagraph);
+					addToParagraphs(paragraph);
+				}
+			}
+		}
+
+		@Override
 		public String getText() {
 			if (getShape() instanceof XSLFTextShape) {
 				return ((XSLFTextShape) getShape()).getText();
@@ -89,6 +149,9 @@ public interface PowerpointTextShape extends PowerpointSimpleShape {
 		public void setText(String text) {
 			if (getShape() instanceof XSLFTextShape) {
 				((XSLFTextShape) getShape()).setText(text);
+				if (getFactory() != null) {
+					updateParagraphs(getFactory());
+				}
 			}
 		}
 

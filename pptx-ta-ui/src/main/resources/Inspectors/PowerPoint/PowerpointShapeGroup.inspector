@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointShapeGroup"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="children" index="800" localize="true" name="ChildCountLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=800;location=left)" />
+			<Number numberType="IntegerType" index="800" data="data.children.size" readOnly="true" columns="10" localize="true" name="ChildCount"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=800;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="children" lang="English" value="children" />
+		<Localized key="children" lang="French" value="éléments" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Group" />
+</Panel>

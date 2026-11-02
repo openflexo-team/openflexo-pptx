@@ -112,6 +112,30 @@ public class PowerpointModelFactory extends PamelaModelFactory implements Pamela
 		return newInstance(PowerpointShapeGroup.class);
 	}
 
+	public PowerpointTable makePowerpointTable() {
+		return newInstance(PowerpointTable.class);
+	}
+
+	public PowerpointTableRow makePowerpointTableRow() {
+		return newInstance(PowerpointTableRow.class);
+	}
+
+	public PowerpointTableCell makePowerpointTableCell() {
+		return newInstance(PowerpointTableCell.class);
+	}
+
+	public PowerpointParagraph makePowerpointParagraph() {
+		return newInstance(PowerpointParagraph.class);
+	}
+
+	public PowerpointChart makePowerpointChart() {
+		return newInstance(PowerpointChart.class);
+	}
+
+	public PowerpointChartSeries makePowerpointChartSeries() {
+		return newInstance(PowerpointChartSeries.class);
+	}
+
 	@Override
 	public synchronized void startDeserializing() {
 		EditingContext editingContext = getResource().getServiceManager().getEditingContext();

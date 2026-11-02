@@ -39,21 +39,20 @@
 package org.openflexo.technologyadapter.powerpoint.view;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.util.logging.Logger;
 
-import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
 import org.openflexo.view.controller.FlexoController;
 
 /**
- * Widget allowing to edit/view a ExcelSheet.<br>
- * We use here an implementation of a MultiSpanCellTable to do it.
+ * Widget showing a {@link PowerpointSlide}, whose shapes can be selected.<br>
+ * The slide is rendered by POI, inside a {@link PowerpointSlideEditor} that provides focus and selection. It is centered and zoomed to
+ * fit the available space, so that no scroll bar is needed.
  * 
  * @author vincent, sguerin
  * 
@@ -62,59 +61,63 @@ import org.openflexo.view.controller.FlexoController;
 public class PowerpointSlideView extends JPanel {
 	static final Logger logger = Logger.getLogger(PowerpointSlideView.class.getPackage().getName());
 
-	private PowerpointSlide slide;
-	private FlexoController controller;
+	/**
+	 * Margin around the slide, in pixels
+	 */
+	private static final int MARGIN = 10;
 
-	private PowerpointSlidePane slidePane;
+	private final PowerpointSlide slide;
+	private final PowerpointSlideEditor editor;
 
 	public PowerpointSlideView(PowerpointSlide slide, FlexoController controller) {
 		super(new BorderLayout());
 		this.slide = slide;
-		this.controller = controller;
-		slidePane = new PowerpointSlidePane(slide);
-		Dimension dimension = slide.getPowerpointSlideshow().getSlideShow().getPageSize();
-		slidePane.setPreferredSize(dimension);
+		editor = new PowerpointSlideEditor(slide, controller);
+		// A GridBagLayout with a single component keeps it centered at its preferred size
+		JPanel centeringPanel = new JPanel(new GridBagLayout());
+		centeringPanel.add(editor.getDrawingView());
+		add(centeringPanel, BorderLayout.CENTER);
+		addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				zoomToFit();
+			}
 
-		JScrollPane pan = new JScrollPane(slidePane);
+			@Override
+			public void componentShown(ComponentEvent e) {
+				zoomToFit();
+			}
+		});
+	}
 
-		add(pan, BorderLayout.CENTER);
+	/**
+	 * Set the scale of the editor so that the whole slide fits in the space available in this view
+	 */
+	public void zoomToFit() {
+		double pageWidth = slide.getPowerpointSlideshow().getPageWidth();
+		double pageHeight = slide.getPowerpointSlideshow().getPageHeight();
+		int availableWidth = getWidth() - 2 * MARGIN;
+		int availableHeight = getHeight() - 2 * MARGIN;
+		if (!isVisible() || pageWidth <= 0 || pageHeight <= 0 || availableWidth <= 0 || availableHeight <= 0) {
+			return;
+		}
+		double scale = Math.min(availableWidth / pageWidth, availableHeight / pageHeight);
+		if (Math.abs(scale - editor.getScale()) > 0.001) {
+			editor.setScale(scale);
+			revalidate();
+		}
 	}
 
 	public PowerpointSlide getSlide() {
 		return slide;
 	}
 
-	/**
-	 * @author vincent
-	 * 
-	 */
-	class PowerpointSlidePane extends JLayeredPane {
+	public PowerpointSlideEditor getEditor() {
+		return editor;
+	}
 
-		private PowerpointSlide slide;
-
-		public PowerpointSlidePane(PowerpointSlide slide) {
-			super();
-			this.slide = slide;
-		}
-
-		public PowerpointSlide getSlide() {
-			return slide;
-		}
-
-		public void setSlide(PowerpointSlide slide) {
-			this.slide = slide;
-		}
-
-		@Override
-		public void paintComponent(Graphics g) {
-			super.paintComponents(g);
-			try {
-				slide.getSlide().draw((Graphics2D) g);
-			} catch (ArrayIndexOutOfBoundsException e) {
-				logger.warning("This slide might contains unparsable comments");
-			}
-
-		}
+	public void delete() {
+		editor.delete();
 	}
 
 }

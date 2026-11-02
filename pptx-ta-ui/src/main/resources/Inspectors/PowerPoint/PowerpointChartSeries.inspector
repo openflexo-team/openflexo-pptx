@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointChartSeries"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="chart_type" index="1300" localize="true" name="ChartTypeLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1300;location=left)" />
+			<TextField index="1300" data="data.chartType" readOnly="true" columns="10" localize="true" name="ChartType"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=1300;location=right)" />
+			<Label label="points" index="1301" localize="true" name="PointCountLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1301;location=left)" />
+			<Number numberType="IntegerType" index="1301" data="data.values.size" readOnly="true" columns="10" localize="true" name="PointCount"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1301;location=right)" />
+			<Label label="data" index="1302" localize="true" name="DataLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1302;location=left)" />
+			<TextArea index="1302" data="data.dataText" readOnly="true" rows="8" columns="10" localize="true" name="Data"
+				constraints="twocols(expandHorizontally=true;expandVertically=true;index=1302;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="chart_type" lang="English" value="kind of chart" />
+		<Localized key="chart_type" lang="French" value="type de graphique" />
+		<Localized key="points" lang="English" value="points" />
+		<Localized key="points" lang="French" value="points" />
+		<Localized key="data" lang="English" value="data" />
+		<Localized key="data" lang="French" value="données" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Chart series" />
+</Panel>

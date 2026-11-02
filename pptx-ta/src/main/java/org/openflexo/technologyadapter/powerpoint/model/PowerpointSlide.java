@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.poi.sl.usermodel.Placeholder;
+import org.apache.poi.xslf.usermodel.XSLFNotes;
+import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
 import org.apache.poi.xslf.usermodel.XSLFTextBox;
 import org.apache.poi.xslf.usermodel.XSLFTextShape;
@@ -147,6 +149,29 @@ public interface PowerpointSlide extends PowerpointObject {
 	public PowerpointTextBox addTextBox(String text, double x, double y, double width, double height);
 
 	/**
+	 * Return the name of the layout this slide is based on, or null
+	 *
+	 * @return
+	 */
+	public String getLayoutName();
+
+	/**
+	 * Return the shape of this slide (at any depth in its groups) with the supplied identifier, or null.<br>
+	 * When several shapes wrongly share this identifier, the first one in z-order is returned.
+	 *
+	 * @param shapeId
+	 * @return
+	 */
+	public PowerpointShape getShapeWithId(int shapeId);
+
+	/**
+	 * Return the speaker notes of this slide (the text of the body of its notes page), or null when it has none
+	 *
+	 * @return
+	 */
+	public String getNotes();
+
+	/**
 	 * Default base implementation for {@link PowerpointSlide}
 	 *
 	 * @author sylvain
@@ -156,6 +181,50 @@ public interface PowerpointSlide extends PowerpointObject {
 
 		@SuppressWarnings("unused")
 		private static final Logger logger = Logger.getLogger(PowerpointSlideImpl.class.getPackage().getName());
+
+		@Override
+		public String getNotes() {
+			XSLFNotes notes = getSlide() != null ? getSlide().getNotes() : null;
+			if (notes == null) {
+				return null;
+			}
+			// The notes page also holds the image of the slide and the slide number: only keep its body
+			StringBuilder returned = new StringBuilder();
+			for (XSLFShape shape : notes.getShapes()) {
+				if (shape instanceof XSLFTextShape && ((XSLFTextShape) shape).getTextType() == Placeholder.BODY) {
+					String text = ((XSLFTextShape) shape).getText();
+					if (text != null && !text.trim().isEmpty()) {
+						returned.append(returned.length() > 0 ? "\n" : "").append(text.trim());
+					}
+				}
+			}
+			return returned.length() > 0 ? returned.toString() : null;
+		}
+
+		@Override
+		public PowerpointShape getShapeWithId(int shapeId) {
+			return findShapeWithId(getPowerpointShapes(), shapeId);
+		}
+
+		private static PowerpointShape findShapeWithId(List<PowerpointShape> shapes, int shapeId) {
+			for (PowerpointShape shape : shapes) {
+				if (shape.getShapeId() == shapeId) {
+					return shape;
+				}
+				if (shape instanceof PowerpointShapeGroup) {
+					PowerpointShape found = findShapeWithId(((PowerpointShapeGroup) shape).getChildren(), shapeId);
+					if (found != null) {
+						return found;
+					}
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public String getLayoutName() {
+			return getSlide() != null && getSlide().getSlideLayout() != null ? getSlide().getSlideLayout().getName() : null;
+		}
 
 		@Override
 		public PowerpointSlideshow getResourceData() {
@@ -205,6 +274,7 @@ public interface PowerpointSlide extends PowerpointObject {
 			PowerpointTextBox powerpointTextBox = getFactory().makePowerpointTextBox();
 			powerpointTextBox.setShape(textBox);
 			addToPowerpointShapes(powerpointTextBox);
+			powerpointTextBox.updateParagraphs(getFactory());
 			return powerpointTextBox;
 		}
 

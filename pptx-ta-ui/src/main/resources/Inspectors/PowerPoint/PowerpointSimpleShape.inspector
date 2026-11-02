@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointSimpleShape"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="geometry" index="400" localize="true" name="GeometryLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=400;location=left)" />
+			<TextField index="400" data="data.shapeTypeName" readOnly="true" columns="10" localize="true" name="Geometry"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=400;location=right)" />
+			<Label label="rotation" index="401" localize="true" name="RotationLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=401;location=left)" />
+			<Number numberType="DoubleType" index="401" data="data.rotation" readOnly="true" columns="10" localize="true" name="Rotation"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=401;location=right)" />
+			<Label label="fill_color" index="402" localize="true" name="FillColorLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=402;location=left)" />
+			<Color index="402" data="data.fillColor" readOnly="true" localize="true" name="FillColor"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=402;location=right)" />
+			<Label label="line_color" index="403" localize="true" name="LineColorLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=403;location=left)" />
+			<Color index="403" data="data.lineColor" readOnly="true" localize="true" name="LineColor"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=403;location=right)" />
+			<Label label="line_width" index="404" localize="true" name="LineWidthLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=404;location=left)" />
+			<Number numberType="DoubleType" index="404" data="data.lineWidth" readOnly="true" columns="10" localize="true" name="LineWidth"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=404;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="fill_color" lang="English" value="fill color" />
+		<Localized key="fill_color" lang="French" value="couleur de fond" />
+		<Localized key="geometry" lang="English" value="geometry" />
+		<Localized key="geometry" lang="French" value="géométrie" />
+		<Localized key="line_color" lang="English" value="line color" />
+		<Localized key="line_color" lang="French" value="couleur du trait" />
+		<Localized key="line_width" lang="English" value="line width" />
+		<Localized key="line_width" lang="French" value="épaisseur du trait" />
+		<Localized key="rotation" lang="English" value="rotation" />
+		<Localized key="rotation" lang="French" value="rotation" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Shape" />
+</Panel>

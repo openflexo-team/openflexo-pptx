@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointTableCell"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="text" index="1100" localize="true" name="TextLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1100;location=left)" />
+			<TextArea index="1100" data="data.text" readOnly="true" rows="3" columns="10" localize="true" name="Text"
+				constraints="twocols(expandHorizontally=true;expandVertically=true;index=1100;location=right)" />
+			<Label label="row" index="1101" localize="true" name="RowIndexLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1101;location=left)" />
+			<Number numberType="IntegerType" index="1101" data="(data.rowIndex + 1)" readOnly="true" columns="10" localize="true" name="RowIndex"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1101;location=right)" />
+			<Label label="column" index="1102" localize="true" name="ColumnIndexLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1102;location=left)" />
+			<Number numberType="IntegerType" index="1102" data="(data.columnIndex + 1)" readOnly="true" columns="10" localize="true" name="ColumnIndex"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1102;location=right)" />
+			<Label label="column_span" index="1103" localize="true" name="GridSpanLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1103;location=left)" />
+			<Number numberType="IntegerType" index="1103" data="data.gridSpan" readOnly="true" columns="10" localize="true" name="GridSpan"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1103;location=right)" />
+			<Label label="row_span" index="1104" localize="true" name="RowSpanLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1104;location=left)" />
+			<Number numberType="IntegerType" index="1104" data="data.rowSpan" readOnly="true" columns="10" localize="true" name="RowSpan"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1104;location=right)" />
+			<Label label="fill_color" index="1105" localize="true" name="FillColorLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1105;location=left)" />
+			<Color index="1105" data="data.fillColor" readOnly="true" localize="true" name="FillColor"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1105;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="text" lang="English" value="text" />
+		<Localized key="text" lang="French" value="texte" />
+		<Localized key="row" lang="English" value="row" />
+		<Localized key="row" lang="French" value="ligne" />
+		<Localized key="column" lang="English" value="column" />
+		<Localized key="column" lang="French" value="colonne" />
+		<Localized key="column_span" lang="English" value="columns spanned" />
+		<Localized key="column_span" lang="French" value="colonnes fusionnées" />
+		<Localized key="row_span" lang="English" value="rows spanned" />
+		<Localized key="row_span" lang="French" value="lignes fusionnées" />
+		<Localized key="fill_color" lang="English" value="fill color" />
+		<Localized key="fill_color" lang="French" value="couleur de fond" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Table cell" />
+</Panel>

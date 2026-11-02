@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel layout="twocols" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide"
+	controllerClassName="org.openflexo.view.controller.FlexoFIBController">
+	<Browser root="data" iteratorClassName="java.lang.Object"
+		visibleRowCount="5" rowHeight="18" boundToSelectionManager="true"
+		selectionMode="DiscontiguousTreeSelection" showFooter="false"
+		rootVisible="true" showRootsHandle="true" localize="true"
+		manageDynamicModel="true"
+		clickAction="controller.singleClick(slideBrowser.selected)"
+		doubleClickAction="controller.doubleClick(slideBrowser.selected)"
+		rightClickAction="controller.rightClick(slideBrowser.selected,event)"
+		name="slideBrowser"
+		constraints="twocols(expandHorizontally=true;expandVertically=true;index=0;insetsBottom=0;insetsLeft=2;insetsRight=2;insetsTop=0;location=center)">
+		<BrowserElement
+			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide"
+			label="slide.name"
+			icon="controller.iconForObject(slide)" isEditable="false"
+			filtered="false" defaultVisible="true" name="slide">
+			<Children data="slide.powerpointShapes" name="shapes" />
+		</BrowserElement>
+		<BrowserElement
+			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointTable"
+			label="table.name"
+			icon="controller.iconForObject(table)" isEditable="false"
+			filtered="false" defaultVisible="true" name="table">
+			<Children data="table.rows" name="rows" />
+		</BrowserElement>
+		<BrowserElement
+			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointTableRow"
+			label="tableRow.name"
+			icon="controller.iconForObject(tableRow)" isEditable="false"
+			filtered="false" defaultVisible="true" name="tableRow">
+			<Children data="tableRow.cells" name="cells" />
+		</BrowserElement>
+		<BrowserElement
+			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointTableCell"
+			label="tableCell.name"
+			icon="controller.iconForObject(tableCell)" isEditable="false"
+			filtered="false" defaultVisible="true" name="tableCell">
+		</BrowserElement>
+		<BrowserElement
+			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointChart"
+			label="chart.name"
+			icon="controller.iconForObject(chart)" isEditable="false"
+			filtered="false" defaultVisible="true" name="chart">
+			<Children data="chart.series" name="series" />
+		</BrowserElement>
+		<BrowserElement
+			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointChartSeries"
+			label="chartSeries.name"
+			icon="controller.iconForObject(chartSeries)" isEditable="false"
+			filtered="false" defaultVisible="true" name="chartSeries">
+		</BrowserElement>
+		<BrowserElement
+			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointTextShape"
+			label="textShape.name"
+			icon="controller.iconForObject(textShape)" isEditable="false"
+			filtered="false" defaultVisible="true" name="textShape">
+			<Children data="textShape.paragraphs" name="paragraphs" />
+		</BrowserElement>
+		<BrowserElement
+			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointParagraph"
+			label="paragraph.name"
+			icon="controller.iconForObject(paragraph)" isEditable="false"
+			filtered="false" defaultVisible="true" name="paragraph">
+		</BrowserElement>
+		<BrowserElement
+			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointShapeGroup"
+			label="group.name"
+			icon="controller.iconForObject(group)" isEditable="false"
+			filtered="false" defaultVisible="true" name="group">
+			<Children data="group.children" name="children" />
+		</BrowserElement>
+		<BrowserElement
+			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointShape"
+			label="shape.name"
+			icon="controller.iconForObject(shape)" isEditable="false"
+			filtered="false" defaultVisible="true" name="shape">
+		</BrowserElement>
+	</Browser>
+	<LocalizedDictionary />
+</Panel>

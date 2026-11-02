@@ -1,0 +1,35 @@
+// Use case: read the tables of a presentation (PPTX-F-1).
+// Slide 3 of NordicEBikes-Design-Review-DR2.pptx holds the requirements table: a header row and 8 requirements,
+// with 5 columns (ID, Requirement, Target, Verification, Status).
+
+ppt = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Business/NordicEBikes-Design-Review-DR2.pptx"];
+assert ppt != null;
+slide = ppt.powerpointSlides.get(2);
+
+// The table is a shape of the slide, listed in z-order with the others
+assert slide.powerpointShapes.size() == 7;
+table = slide.powerpointShapes.get(6);
+assert table.name == "Requirements table";
+assert table.rows.size() == 9;
+assert table.numberOfColumns == 5;
+
+// Header row
+header = table.rows.get(0);
+assert header.rowIndex == 0;
+assert header.cells.size() == 5;
+assert header.cells.get(0).text == "ID";
+assert header.cells.get(4).text == "Status";
+
+// A requirement, read cell by cell
+requirement = table.rows.get(2);
+assert requirement.cells.get(0).text == "REQ-02";
+assert requirement.cells.get(1).text == "Total mass";
+assert requirement.cells.get(4).text == "At risk";
+assert requirement.cells.get(4).rowIndex == 2;
+assert requirement.cells.get(4).columnIndex == 4;
+
+// Direct access to a cell, and navigation back to the slide
+cell = table.getCell(1, 0);
+assert cell.text == "REQ-01";
+assert cell.tableRow.table == table;
+assert cell.powerpointSlide == slide;

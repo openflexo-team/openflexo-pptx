@@ -38,10 +38,22 @@
 
 package org.openflexo.technologyadapter.powerpoint.model;
 
+import java.util.List;
 import java.util.logging.Logger;
 
+import org.openflexo.pamela.annotations.Adder;
+import org.openflexo.pamela.annotations.CloningStrategy;
+import org.openflexo.pamela.annotations.CloningStrategy.StrategyType;
+import org.openflexo.pamela.annotations.Embedded;
+import org.openflexo.pamela.annotations.Getter;
+import org.openflexo.pamela.annotations.Getter.Cardinality;
 import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
+import org.openflexo.pamela.annotations.PastingPoint;
+import org.openflexo.pamela.annotations.PropertyIdentifier;
+import org.openflexo.pamela.annotations.Remover;
+import org.openflexo.pamela.annotations.Setter;
+import org.openflexo.pamela.annotations.XMLElement;
 
 /**
  * Represents a PowerPoint group of shapes (backed by a POI XSLFGroupShape).
@@ -52,6 +64,30 @@ import org.openflexo.pamela.annotations.ModelEntity;
 @ModelEntity
 @ImplementationClass(value = PowerpointShapeGroup.PowerpointShapeGroupImpl.class)
 public interface PowerpointShapeGroup extends PowerpointShape {
+
+	@PropertyIdentifier(type = PowerpointShape.class, cardinality = Cardinality.LIST)
+	public static final String CHILDREN_KEY = "children";
+
+	/**
+	 * Return the shapes contained in this group, in z-order (the last one is drawn on top)
+	 *
+	 * @return
+	 */
+	@Getter(value = CHILDREN_KEY, cardinality = Cardinality.LIST, inverse = PowerpointShape.CONTAINER_KEY)
+	@XMLElement
+	@Embedded
+	@CloningStrategy(StrategyType.CLONE)
+	public List<PowerpointShape> getChildren();
+
+	@Setter(CHILDREN_KEY)
+	public void setChildren(List<PowerpointShape> children);
+
+	@Adder(CHILDREN_KEY)
+	@PastingPoint
+	public void addToChildren(PowerpointShape aShape);
+
+	@Remover(CHILDREN_KEY)
+	public void removeFromChildren(PowerpointShape aShape);
 
 	/**
 	 * Default base implementation for {@link PowerpointShapeGroup}

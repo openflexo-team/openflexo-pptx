@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="slides" index="100" localize="true" name="SlideCountLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=100;location=left)" />
+			<Number numberType="IntegerType" index="100" data="data.powerpointSlides.size" readOnly="true" columns="10" localize="true" name="SlideCount"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=100;location=right)" />
+			<Label label="page_width" index="101" localize="true" name="PageWidthLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=101;location=left)" />
+			<Number numberType="DoubleType" index="101" data="data.pageWidth" readOnly="true" columns="10" localize="true" name="PageWidth"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=101;location=right)" />
+			<Label label="page_height" index="102" localize="true" name="PageHeightLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=102;location=left)" />
+			<Number numberType="DoubleType" index="102" data="data.pageHeight" readOnly="true" columns="10" localize="true" name="PageHeight"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=102;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="page_height" lang="English" value="page height" />
+		<Localized key="page_height" lang="French" value="hauteur de page" />
+		<Localized key="page_width" lang="English" value="page width" />
+		<Localized key="page_width" lang="French" value="largeur de page" />
+		<Localized key="slides" lang="English" value="slides" />
+		<Localized key="slides" lang="French" value="diapositives" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Presentation" />
+</Panel>

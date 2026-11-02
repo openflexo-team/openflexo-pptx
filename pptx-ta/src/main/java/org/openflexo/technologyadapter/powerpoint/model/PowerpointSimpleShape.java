@@ -38,8 +38,10 @@
 
 package org.openflexo.technologyadapter.powerpoint.model;
 
+import java.awt.Color;
 import java.util.logging.Logger;
 
+import org.apache.poi.xslf.usermodel.XSLFSimpleShape;
 import org.openflexo.pamela.annotations.ModelEntity;
 
 /**
@@ -52,6 +54,41 @@ import org.openflexo.pamela.annotations.ModelEntity;
 public interface PowerpointSimpleShape extends PowerpointShape {
 
 	/**
+	 * Return the name of the geometry of this shape (a preset such as RECT or ROUND_RECT), or null for a custom geometry
+	 *
+	 * @return
+	 */
+	public String getShapeTypeName();
+
+	/**
+	 * Return the rotation of this shape, in degrees
+	 *
+	 * @return
+	 */
+	public double getRotation();
+
+	/**
+	 * Return the solid fill color of this shape, or null when it has none
+	 *
+	 * @return
+	 */
+	public Color getFillColor();
+
+	/**
+	 * Return the solid line color of this shape, or null when it has none
+	 *
+	 * @return
+	 */
+	public Color getLineColor();
+
+	/**
+	 * Return the width of the line of this shape, in points
+	 *
+	 * @return
+	 */
+	public double getLineWidth();
+
+	/**
 	 * Default base implementation for {@link PowerpointSimpleShape}
 	 *
 	 * @author sylvain
@@ -61,6 +98,35 @@ public interface PowerpointSimpleShape extends PowerpointShape {
 
 		@SuppressWarnings("unused")
 		private static final Logger logger = Logger.getLogger(PowerpointSimpleShapeImpl.class.getPackage().getName());
+
+		private XSLFSimpleShape getSimpleShape() {
+			return getShape() instanceof XSLFSimpleShape ? (XSLFSimpleShape) getShape() : null;
+		}
+
+		@Override
+		public String getShapeTypeName() {
+			return getSimpleShape() != null && getSimpleShape().getShapeType() != null ? getSimpleShape().getShapeType().toString() : null;
+		}
+
+		@Override
+		public double getRotation() {
+			return getSimpleShape() != null ? getSimpleShape().getRotation() : 0;
+		}
+
+		@Override
+		public Color getFillColor() {
+			return getSimpleShape() != null ? getSimpleShape().getFillColor() : null;
+		}
+
+		@Override
+		public Color getLineColor() {
+			return getSimpleShape() != null ? getSimpleShape().getLineColor() : null;
+		}
+
+		@Override
+		public double getLineWidth() {
+			return getSimpleShape() != null ? getSimpleShape().getLineWidth() : 0;
+		}
 
 	}
 

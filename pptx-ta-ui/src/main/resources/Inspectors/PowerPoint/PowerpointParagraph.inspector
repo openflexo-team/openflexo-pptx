@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointParagraph"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="text" index="1400" localize="true" name="TextLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1400;location=left)" />
+			<TextArea index="1400" data="data.text" readOnly="true" rows="3" columns="10" localize="true" name="Text"
+				constraints="twocols(expandHorizontally=true;expandVertically=true;index=1400;location=right)" />
+			<Label label="level" index="1401" localize="true" name="LevelLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1401;location=left)" />
+			<Number numberType="IntegerType" index="1401" data="data.level" readOnly="true" columns="10" localize="true" name="Level"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1401;location=right)" />
+			<Label label="bullet" index="1402" localize="true" name="BulletLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1402;location=left)" />
+			<CheckBox index="1402" data="data.bullet" readOnly="true" localize="true" name="Bullet"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1402;location=right)" />
+			<Label label="bullet_character" index="1403" localize="true" name="BulletCharacterLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1403;location=left)" />
+			<TextField index="1403" data="data.bulletCharacter" readOnly="true" columns="10" localize="true" name="BulletCharacter"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=1403;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="text" lang="English" value="text" />
+		<Localized key="text" lang="French" value="texte" />
+		<Localized key="level" lang="English" value="level" />
+		<Localized key="level" lang="French" value="niveau" />
+		<Localized key="bullet" lang="English" value="list item" />
+		<Localized key="bullet" lang="French" value="élément de liste" />
+		<Localized key="bullet_character" lang="English" value="bullet" />
+		<Localized key="bullet_character" lang="French" value="puce" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Paragraph" />
+</Panel>

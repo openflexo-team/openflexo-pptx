@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointShape"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="x" index="300" localize="true" name="XLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=300;location=left)" />
+			<Number numberType="DoubleType" index="300" data="data.x" readOnly="true" columns="10" localize="true" name="X"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=300;location=right)" />
+			<Label label="y" index="301" localize="true" name="YLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=301;location=left)" />
+			<Number numberType="DoubleType" index="301" data="data.y" readOnly="true" columns="10" localize="true" name="Y"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=301;location=right)" />
+			<Label label="width" index="302" localize="true" name="WidthLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=302;location=left)" />
+			<Number numberType="DoubleType" index="302" data="data.width" readOnly="true" columns="10" localize="true" name="Width"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=302;location=right)" />
+			<Label label="height" index="303" localize="true" name="HeightLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=303;location=left)" />
+			<Number numberType="DoubleType" index="303" data="data.height" readOnly="true" columns="10" localize="true" name="Height"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=303;location=right)" />
+			<Label label="group" index="304" localize="true" name="GroupLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=304;location=left)" />
+			<TextField index="304" data="data.container.name" readOnly="true" columns="10" localize="true" name="Group"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=304;location=right)" />
+			<Label label="shape_id" index="305" localize="true" name="ShapeIdLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=305;location=left)" />
+			<Number numberType="IntegerType" index="305" data="data.shapeId" readOnly="true" columns="10" localize="true" name="ShapeId"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=305;location=right)" />
+			<Label label="alt_text" index="306" localize="true" name="AltTextLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=306;location=left)" />
+			<TextField index="306" data="data.altText" readOnly="true" columns="10" localize="true" name="AltText"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=306;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="group" lang="English" value="group" />
+		<Localized key="group" lang="French" value="groupe" />
+		<Localized key="height" lang="English" value="height" />
+		<Localized key="height" lang="French" value="hauteur" />
+		<Localized key="width" lang="English" value="width" />
+		<Localized key="width" lang="French" value="largeur" />
+		<Localized key="x" lang="English" value="x" />
+		<Localized key="x" lang="French" value="x" />
+		<Localized key="y" lang="English" value="y" />
+		<Localized key="y" lang="French" value="y" />
+		<Localized key="shape_id" lang="English" value="identifier" />
+		<Localized key="shape_id" lang="French" value="identifiant" />
+		<Localized key="alt_text" lang="English" value="alternative text" />
+		<Localized key="alt_text" lang="French" value="texte alternatif" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Shape" />
+</Panel>

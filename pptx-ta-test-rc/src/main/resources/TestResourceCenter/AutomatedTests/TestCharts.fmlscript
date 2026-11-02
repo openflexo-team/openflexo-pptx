@@ -1,0 +1,42 @@
+// Use case: read the data of the charts of a presentation (PPTX-F-1).
+// Slide 9 of BrasserieDuFjord-Seasonal-Launch-Plan.pptx: a doughnut chart of the launch budget (one series, 6 items).
+// Slide 13 of ArmorAssurances-Strategic-Plan-2030.pptx: a combination chart, premiums in columns and combined ratio in a
+// line, from 2026 to 2030.
+
+brasserie = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Business/BrasserieDuFjord-Seasonal-Launch-Plan.pptx"];
+budget = brasserie.powerpointSlides.get(8).powerpointShapes.get(4);
+assert budget.name == "Budget doughnut";
+assert budget.chartType == "doughnut";
+assert budget.series.size() == 1;
+
+items = budget.series.get(0);
+assert items.name == "Budget";
+assert items.categories.size() == 6;
+assert items.categories.get(0) == "Launch party";
+assert items.values.size() == 6;
+assert items.getValue("Launch party") == 12000.0;
+assert items.getValue("Press") == 3000.0;
+assert items.chart == budget;
+
+armor = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Business/ArmorAssurances-Strategic-Plan-2030.pptx"];
+trajectory = armor.powerpointSlides.get(12).powerpointShapes.get(5);
+assert trajectory.name == "Trajectory chart";
+assert trajectory.chartType == "column, line";
+assert trajectory.series.size() == 2;
+
+premiums = trajectory.getSeries("Premiums (M€)");
+assert premiums.chartType == "column";
+// Years are multi-level categories, that POI does not read: they are read from the cache of the chart
+assert premiums.categories.size() == 5;
+assert premiums.categories.get(4) == "2030";
+assert premiums.getValue("2030") == 1600.0;
+ratio = trajectory.getSeries("Combined ratio (%)");
+assert ratio.chartType == "line";
+assert ratio.categories.get(4) == "2030";
+assert ratio.getValue("2028") == 95.8;
+
+// A chart with a title: slide 3 of CycloCity-Company-Presentation.pptx
+cyclo = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Business/CycloCity-Company-Presentation.pptx"];
+market = cyclo.powerpointSlides.get(2).powerpointShapes.get(5);
+assert market.title == "Rides in shared-bike systems, Europe (millions)";
+assert trajectory.title == null;

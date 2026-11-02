@@ -1,0 +1,23 @@
+// Use case: read the paragraphs of a text, for instance the items of a bulleted list (PPTX-F-1).
+// Slide 2 of CycloCity-Company-Presentation.pptx holds a text box "Key facts" with 5 bulleted items.
+
+ppt = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Business/CycloCity-Company-Presentation.pptx"];
+slide = ppt.powerpointSlides.get(1);
+facts = slide.powerpointShapes.get(4);
+assert facts.name == "Key facts";
+assert facts.paragraphs.size() == 5;
+
+first = facts.paragraphs.get(0);
+assert first.text == "Operates public bike-sharing services under 8-year concessions granted by city councils";
+assert first.bullet == true;
+assert first.bulletCharacter == "•";
+assert first.level == 0;
+assert first.index == 0;
+assert first.textShape == facts;
+assert first.powerpointSlide == slide;
+assert facts.paragraphs.get(1).text == "Fleet of 4,800 connected bikes, 35% of them electric-assist";
+
+// The title of the slide is a single paragraph without bullet
+title = slide.powerpointShapes.get(1);
+assert title.paragraphs.size() == 1;
+assert title.paragraphs.get(0).bullet == false;

@@ -75,4 +75,79 @@ public class TestPPTInspectors extends GenericFIBInspectorTestCase {
 		validateFIB("Inspectors/PowerPoint/EditionAction/SelectPowerpointSlide.inspector");
 	}
 
+	@Test
+	public void testPowerpointObjectInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointObject.inspector");
+	}
+
+	@Test
+	public void testPowerpointSlideshowInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointSlideshow.inspector");
+	}
+
+	@Test
+	public void testPowerpointSlideInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointSlide.inspector");
+	}
+
+	@Test
+	public void testPowerpointShapeInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointShape.inspector");
+	}
+
+	@Test
+	public void testPowerpointSimpleShapeInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointSimpleShape.inspector");
+	}
+
+	@Test
+	public void testPowerpointTextShapeInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointTextShape.inspector");
+	}
+
+	@Test
+	public void testPowerpointPictureInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointPicture.inspector");
+	}
+
+	@Test
+	public void testPowerpointLineInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointLine.inspector");
+	}
+
+	@Test
+	public void testPowerpointShapeGroupInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointShapeGroup.inspector");
+	}
+
+	@Test
+	public void testPowerpointTableInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointTable.inspector");
+	}
+
+	@Test
+	public void testPowerpointTableRowInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointTableRow.inspector");
+	}
+
+	@Test
+	public void testPowerpointTableCellInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointTableCell.inspector");
+	}
+
+	@Test
+	public void testPowerpointChartInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointChart.inspector");
+	}
+
+	@Test
+	public void testPowerpointChartSeriesInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointChartSeries.inspector");
+	}
+
+	@Test
+	public void testPowerpointParagraphInspector() {
+		validateFIB("Inspectors/PowerPoint/PowerpointParagraph.inspector");
+	}
+
 }

@@ -40,21 +40,35 @@ package org.openflexo.technologyadapter.powerpoint.model.io;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.poi.xddf.usermodel.chart.XDDFChartData;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFAutoShape;
+import org.apache.poi.xslf.usermodel.XSLFChart;
 import org.apache.poi.xslf.usermodel.XSLFConnectorShape;
+import org.apache.poi.xslf.usermodel.XSLFGraphicFrame;
 import org.apache.poi.xslf.usermodel.XSLFGroupShape;
 import org.apache.poi.xslf.usermodel.XSLFPictureShape;
 import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
+import org.apache.poi.xslf.usermodel.XSLFTable;
+import org.apache.poi.xslf.usermodel.XSLFTableCell;
+import org.apache.poi.xslf.usermodel.XSLFTableRow;
 import org.apache.poi.xslf.usermodel.XSLFTextBox;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointChart;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointChartSeries;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointModelFactory;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointObject;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointShapeGroup;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointTable;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointTableCell;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointTableRow;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointTextShape;
 import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource;
 
 /**
@@ -122,6 +136,12 @@ public class BasicPowerpointModelConverter {
 		if (shape instanceof XSLFGroupShape) {
 			powerpointShape = getFactory().makePowerpointShapeGroup();
 		}
+		else if (shape instanceof XSLFTable) {
+			powerpointShape = getFactory().makePowerpointTable();
+		}
+		else if (shape instanceof XSLFGraphicFrame && ((XSLFGraphicFrame) shape).hasChart()) {
+			powerpointShape = getFactory().makePowerpointChart();
+		}
 		else if (shape instanceof XSLFPictureShape) {
 			powerpointShape = getFactory().makePowerpointPicture();
 		}
@@ -140,7 +160,59 @@ public class BasicPowerpointModelConverter {
 		}
 		powerpointShape.setShape(shape);
 		powerpointObjects.put(shape, powerpointShape);
+		if (shape instanceof XSLFGroupShape) {
+			for (XSLFShape child : ((XSLFGroupShape) shape).getShapes()) {
+				PowerpointShape powerpointChild = convertShape(child, slide);
+				if (powerpointChild != null) {
+					((PowerpointShapeGroup) powerpointShape).addToChildren(powerpointChild);
+				}
+			}
+		}
+		if (shape instanceof XSLFTable) {
+			convertTableRows((XSLFTable) shape, (PowerpointTable) powerpointShape);
+		}
+		else if (powerpointShape instanceof PowerpointChart) {
+			convertChartSeries((PowerpointChart) powerpointShape);
+		}
+		else if (powerpointShape instanceof PowerpointTextShape) {
+			((PowerpointTextShape) powerpointShape).updateParagraphs(getFactory());
+		}
 		return powerpointShape;
+	}
+
+	private void convertChartSeries(PowerpointChart powerpointChart) {
+		XSLFChart chart = powerpointChart.getChart();
+		if (chart == null) {
+			return;
+		}
+		try {
+			for (XDDFChartData chartData : chart.getChartSeries()) {
+				for (int i = 0; i < chartData.getSeriesCount(); i++) {
+					PowerpointChartSeries series = getFactory().makePowerpointChartSeries();
+					series.setChartData(chartData);
+					series.setSeriesIndex(i);
+					powerpointChart.addToSeries(series);
+				}
+			}
+		} catch (RuntimeException e) {
+			// POI does not read every kind of chart: keep the chart, without its series
+			logger.log(Level.WARNING, "Could not read the series of chart " + powerpointChart.getName(), e);
+		}
+	}
+
+	private void convertTableRows(XSLFTable table, PowerpointTable powerpointTable) {
+		for (XSLFTableRow row : table.getRows()) {
+			PowerpointTableRow powerpointRow = getFactory().makePowerpointTableRow();
+			powerpointRow.setRow(row);
+			powerpointObjects.put(row, powerpointRow);
+			powerpointTable.addToRows(powerpointRow);
+			for (XSLFTableCell cell : row.getCells()) {
+				PowerpointTableCell powerpointCell = getFactory().makePowerpointTableCell();
+				powerpointCell.setCell(cell);
+				powerpointObjects.put(cell, powerpointCell);
+				powerpointRow.addToCells(powerpointCell);
+			}
+		}
 	}
 
 	/**

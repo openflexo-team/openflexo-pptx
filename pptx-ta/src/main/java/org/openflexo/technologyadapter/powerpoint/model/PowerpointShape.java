@@ -41,7 +41,10 @@ package org.openflexo.technologyadapter.powerpoint.model;
 import java.awt.geom.Rectangle2D;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+
 import org.apache.poi.xslf.usermodel.XSLFShape;
+import org.apache.xmlbeans.XmlCursor;
 import org.openflexo.pamela.annotations.Getter;
 import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.pamela.annotations.PropertyIdentifier;
@@ -54,12 +57,14 @@ import org.openflexo.pamela.annotations.Setter;
  *
  */
 @ModelEntity(isAbstract = true)
-public interface PowerpointShape extends PowerpointObject {
+public interface PowerpointShape extends PowerpointSlideElement {
 
 	@PropertyIdentifier(type = PowerpointSlide.class)
 	public static final String SLIDE_KEY = "powerpointSlide";
 	@PropertyIdentifier(type = XSLFShape.class)
 	public static final String SHAPE_KEY = "shape";
+	@PropertyIdentifier(type = PowerpointShapeGroup.class)
+	public static final String CONTAINER_KEY = "container";
 
 	/**
 	 * Return {@link PowerpointSlide} where this {@link PowerpointShape} is defined
@@ -71,6 +76,17 @@ public interface PowerpointShape extends PowerpointObject {
 
 	@Setter(SLIDE_KEY)
 	public void setPowerpointSlide(PowerpointSlide slide);
+
+	/**
+	 * Return the {@link PowerpointShapeGroup} containing this shape, or null when the shape is located at the top level of its slide
+	 *
+	 * @return
+	 */
+	@Getter(value = CONTAINER_KEY, inverse = PowerpointShapeGroup.CHILDREN_KEY)
+	public PowerpointShapeGroup getContainer();
+
+	@Setter(CONTAINER_KEY)
+	public void setContainer(PowerpointShapeGroup container);
 
 	/**
 	 * Return the POI {@link XSLFShape} wrapped by this {@link PowerpointShape}
@@ -108,6 +124,21 @@ public interface PowerpointShape extends PowerpointObject {
 	public void setText(String text);
 
 	/**
+	 * Return the identifier of this shape in its slide (the id of its non-visual properties), used by connectors to designate the shapes
+	 * they are glued to
+	 *
+	 * @return
+	 */
+	public int getShapeId();
+
+	/**
+	 * Return the alternative text (description) of this shape, or null when it has none
+	 *
+	 * @return
+	 */
+	public String getAltText();
+
+	/**
 	 * Default base implementation for {@link PowerpointShape}
 	 *
 	 * @author sylvain
@@ -117,6 +148,37 @@ public interface PowerpointShape extends PowerpointObject {
 
 		@SuppressWarnings("unused")
 		private static final Logger logger = Logger.getLogger(PowerpointShapeImpl.class.getPackage().getName());
+
+		@Override
+		public int getShapeId() {
+			return getShape() != null ? getShape().getShapeId() : -1;
+		}
+
+		@Override
+		public String getAltText() {
+			if (getShape() == null) {
+				return null;
+			}
+			// <p:sp><p:nvSpPr><p:cNvPr descr="..."/> : the same structure for every kind of shape
+			try (XmlCursor cursor = getShape().getXmlObject().newCursor()) {
+				if (cursor.toFirstChild() && cursor.toFirstChild()) {
+					String descr = cursor.getAttributeText(new QName("descr"));
+					return descr != null && !descr.isEmpty() ? descr : null;
+				}
+			}
+			return null;
+		}
+
+		/**
+		 * A shape located in a group is not referenced by its slide: return the slide of its container
+		 */
+		@Override
+		public PowerpointSlide getPowerpointSlide() {
+			if (getContainer() != null) {
+				return getContainer().getPowerpointSlide();
+			}
+			return (PowerpointSlide) performSuperGetter(SLIDE_KEY);
+		}
 
 		@Override
 		public PowerpointSlideshow getResourceData() {
@@ -130,6 +192,9 @@ public interface PowerpointShape extends PowerpointObject {
 
 		@Override
 		public String getUri() {
+			if (getContainer() != null) {
+				return getContainer().getUri() + "/shape[" + getContainer().getChildren().indexOf(this) + "]";
+			}
 			PowerpointSlide slide = getPowerpointSlide();
 			String parentUri = slide != null ? slide.getUri() : "pptx:slideshow";
 			int index = slide != null ? slide.getPowerpointShapes().indexOf(this) : -1;

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="slide_number" index="200" localize="true" name="SlideNumberLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=200;location=left)" />
+			<Number numberType="IntegerType" index="200" data="(data.slideNumber + 1)" readOnly="true" columns="10" localize="true" name="SlideNumber"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=200;location=right)" />
+			<Label label="title" index="201" localize="true" name="TitleLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=201;location=left)" />
+			<TextField index="201" data="data.title" readOnly="true" columns="10" localize="true" name="Title"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=201;location=right)" />
+			<Label label="layout" index="202" localize="true" name="LayoutLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=202;location=left)" />
+			<TextField index="202" data="data.layoutName" readOnly="true" columns="10" localize="true" name="Layout"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=202;location=right)" />
+			<Label label="shapes" index="203" localize="true" name="ShapeCountLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=203;location=left)" />
+			<Number numberType="IntegerType" index="203" data="data.powerpointShapes.size" readOnly="true" columns="10" localize="true" name="ShapeCount"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=203;location=right)" />
+			<Label label="notes" index="204" localize="true" name="NotesLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=204;location=left)" />
+			<TextArea index="204" data="data.notes" readOnly="true" rows="5" columns="10" localize="true" name="Notes"
+				constraints="twocols(expandHorizontally=true;expandVertically=true;index=204;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="layout" lang="English" value="layout" />
+		<Localized key="layout" lang="French" value="disposition" />
+		<Localized key="shapes" lang="English" value="shapes" />
+		<Localized key="shapes" lang="French" value="formes" />
+		<Localized key="slide_number" lang="English" value="slide number" />
+		<Localized key="slide_number" lang="French" value="numéro" />
+		<Localized key="title" lang="English" value="title" />
+		<Localized key="title" lang="French" value="titre" />
+		<Localized key="notes" lang="English" value="speaker notes" />
+		<Localized key="notes" lang="French" value="notes du présentateur" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Slide" />
+</Panel>

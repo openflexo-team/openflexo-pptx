@@ -38,8 +38,16 @@
 
 package org.openflexo.technologyadapter.powerpoint.model;
 
+import java.awt.Image;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
+
+import org.apache.poi.xslf.usermodel.XSLFPictureData;
+import org.apache.poi.xslf.usermodel.XSLFPictureShape;
 import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
 
@@ -54,6 +62,27 @@ import org.openflexo.pamela.annotations.ModelEntity;
 public interface PowerpointPicture extends PowerpointSimpleShape {
 
 	/**
+	 * Return the content type of the image (for instance image/png), or null
+	 *
+	 * @return
+	 */
+	public String getContentType();
+
+	/**
+	 * Return the name of the image file inside the presentation, or null
+	 *
+	 * @return
+	 */
+	public String getPictureFileName();
+
+	/**
+	 * Return the image itself, or null when its format cannot be read (vector formats such as EMF or SVG)
+	 *
+	 * @return
+	 */
+	public Image getImage();
+
+	/**
 	 * Default base implementation for {@link PowerpointPicture}
 	 *
 	 * @author sylvain
@@ -61,8 +90,34 @@ public interface PowerpointPicture extends PowerpointSimpleShape {
 	 */
 	public static abstract class PowerpointPictureImpl extends PowerpointSimpleShapeImpl implements PowerpointPicture {
 
-		@SuppressWarnings("unused")
 		private static final Logger logger = Logger.getLogger(PowerpointPictureImpl.class.getPackage().getName());
+
+		private XSLFPictureData getPictureData() {
+			return getShape() instanceof XSLFPictureShape ? ((XSLFPictureShape) getShape()).getPictureData() : null;
+		}
+
+		@Override
+		public String getContentType() {
+			return getPictureData() != null ? getPictureData().getContentType() : null;
+		}
+
+		@Override
+		public String getPictureFileName() {
+			return getPictureData() != null ? getPictureData().getFileName() : null;
+		}
+
+		@Override
+		public Image getImage() {
+			if (getPictureData() == null) {
+				return null;
+			}
+			try {
+				return ImageIO.read(new ByteArrayInputStream(getPictureData().getData()));
+			} catch (IOException e) {
+				logger.log(Level.FINE, "Could not read image " + getPictureFileName(), e);
+				return null;
+			}
+		}
 
 	}
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointTable"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="rows" index="900" localize="true" name="RowCountLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=900;location=left)" />
+			<Number numberType="IntegerType" index="900" data="data.rows.size" readOnly="true" columns="10" localize="true" name="RowCount"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=900;location=right)" />
+			<Label label="columns" index="901" localize="true" name="ColumnCountLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=901;location=left)" />
+			<Number numberType="IntegerType" index="901" data="data.numberOfColumns" readOnly="true" columns="10" localize="true" name="ColumnCount"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=901;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="rows" lang="English" value="rows" />
+		<Localized key="rows" lang="French" value="lignes" />
+		<Localized key="columns" lang="English" value="columns" />
+		<Localized key="columns" lang="French" value="colonnes" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Table" />
+</Panel>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointTextShape"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="text" index="500" localize="true" name="TextLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=500;location=left)" />
+			<TextArea index="500" data="data.text" readOnly="true" rows="5" columns="10" localize="true" name="Text"
+				constraints="twocols(expandHorizontally=true;expandVertically=true;index=500;location=right)" />
+			<Label label="paragraphs" index="501" localize="true" name="ParagraphCountLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=501;location=left)" />
+			<Number numberType="IntegerType" index="501" data="data.paragraphs.size" readOnly="true" columns="10" localize="true" name="ParagraphCount"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=501;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="text" lang="English" value="text" />
+		<Localized key="text" lang="French" value="texte" />
+		<Localized key="paragraphs" lang="English" value="paragraphs" />
+		<Localized key="paragraphs" lang="French" value="paragraphes" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Text shape" />
+</Panel>

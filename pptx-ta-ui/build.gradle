@@ -3,6 +3,9 @@ dependencies {
 
   // openflexo dep
   implementation flexoUi()
+  implementation dianaApi()
+  implementation diana()
+  implementation dianaSwing()
   runtimeOnly fmlTechnologyAdapterUi()
 
   // external dep

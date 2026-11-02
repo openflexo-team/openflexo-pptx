@@ -1,0 +1,38 @@
+// Use case: navigate the shapes a connector is glued to (PPTX-F-1).
+// Slide 8 of CycloCity-Company-Presentation.pptx (platform architecture): connectors link the cards, some of them
+// located inside groups. Slide 11 (organization): elbow connectors from a manager to each member of the team.
+
+ppt = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Business/CycloCity-Company-Presentation.pptx"];
+assert ppt != null;
+
+// Slide 8: a connector between two shapes located in groups
+architecture = ppt.powerpointSlides.get(7);
+connector1 = architecture.powerpointShapes.get(9);
+assert connector1.name == "Connector 1: Smart bike to Docking station";
+assert connector1.startShape.name == "Smart bike";
+assert connector1.startShape.container.name == "Group Smart bike";
+assert connector1.startConnectionSite == 3;
+assert connector1.endShape.name == "Docking station";
+assert connector1.endConnectionSite == 1;
+
+// A connector glued to a top-level shape
+connector5 = architecture.powerpointShapes.get(20);
+assert connector5.name == "Connector 5: Cloud platform to Rides database";
+assert connector5.endShape.name == "Rides database";
+assert connector5.endShape.container == null;
+
+// Shape identity: the identifier designates the shape in its slide
+assert architecture.getShapeWithId(connector1.startShape.shapeId) == connector1.startShape;
+
+// Slide 11: the organization chart
+organization = ppt.powerpointSlides.get(10);
+ceoToCto = organization.powerpointShapes.get(23);
+assert ceoToCto.name == "Connector 2: CEO to CTO";
+assert ceoToCto.startShape.name == "CEO";
+assert ceoToCto.endShape.name == "CTO";
+
+// The alternative text of a picture
+group = architecture.powerpointShapes.get(4);
+icon = group.children.get(1);
+assert icon.name == "Smart bike icon";
+assert icon.altText == "Icon: bike";

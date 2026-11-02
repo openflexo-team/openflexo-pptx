@@ -1,0 +1,34 @@
+// Use case: navigate the shapes located inside groups (PPTX-F-1).
+// Slide 8 of CycloCity-Company-Presentation.pptx (platform architecture) holds 27 top-level shapes, among which
+// 7 groups; each group gathers a card (auto-shape with its text) and its icon (picture).
+
+ppt = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Business/CycloCity-Company-Presentation.pptx"];
+assert ppt != null;
+slide = ppt.powerpointSlides.get(7);
+// The title of these generated decks is a plain text box, not a title placeholder
+assert slide.powerpointShapes.get(1).text == "Platform architecture";
+
+// Grouped shapes are not listed at the top level of their slide
+assert slide.powerpointShapes.size() == 27;
+
+group = slide.powerpointShapes.get(4);
+assert group.name == "Group Smart bike";
+assert group.container == null;
+assert group.children.size() == 2;
+
+// Children, in z-order: the card, then its icon drawn on top
+card = group.children.get(0);
+assert card.name == "Smart bike";
+assert card.container == group;
+assert card.powerpointSlide == slide;
+icon = group.children.get(1);
+assert icon.name == "Smart bike icon";
+assert icon.container == group;
+assert icon.powerpointSlide == slide;
+
+// The same holds for a group located after other shapes
+lastGroup = slide.powerpointShapes.get(19);
+assert lastGroup.name == "Group Payment provider";
+assert lastGroup.children.size() == 2;
+assert lastGroup.children.get(1).name == "Payment provider icon";
+assert lastGroup.children.get(1).powerpointSlide == slide;

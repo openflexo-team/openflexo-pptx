@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointTableRow"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="row" index="1000" localize="true" name="RowIndexLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1000;location=left)" />
+			<Number numberType="IntegerType" index="1000" data="(data.rowIndex + 1)" readOnly="true" columns="10" localize="true" name="RowIndex"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1000;location=right)" />
+			<Label label="height" index="1001" localize="true" name="HeightLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1001;location=left)" />
+			<Number numberType="DoubleType" index="1001" data="data.height" readOnly="true" columns="10" localize="true" name="Height"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1001;location=right)" />
+			<Label label="cells" index="1002" localize="true" name="CellCountLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1002;location=left)" />
+			<Number numberType="IntegerType" index="1002" data="data.cells.size" readOnly="true" columns="10" localize="true" name="CellCount"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=1002;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="row" lang="English" value="row" />
+		<Localized key="row" lang="French" value="ligne" />
+		<Localized key="height" lang="English" value="height" />
+		<Localized key="height" lang="French" value="hauteur" />
+		<Localized key="cells" lang="English" value="cells" />
+		<Localized key="cells" lang="French" value="cellules" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Table row" />
+</Panel>

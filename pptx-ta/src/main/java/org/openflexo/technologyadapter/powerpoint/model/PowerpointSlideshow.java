@@ -70,7 +70,8 @@ import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource
 @ModelEntity
 @ImplementationClass(value = PowerpointSlideshow.PowerpointSlideshowImpl.class)
 @Imports({ @Import(PowerpointTextBox.class), @Import(PowerpointAutoShape.class), @Import(PowerpointPicture.class),
-		@Import(PowerpointLine.class), @Import(PowerpointShapeGroup.class) })
+		@Import(PowerpointLine.class), @Import(PowerpointShapeGroup.class), @Import(PowerpointTable.class),
+		@Import(PowerpointChart.class) })
 public interface PowerpointSlideshow extends PowerpointObject, ResourceData<PowerpointSlideshow> {
 
 	@PropertyIdentifier(type = XMLSlideShow.class)
@@ -134,6 +135,20 @@ public interface PowerpointSlideshow extends PowerpointObject, ResourceData<Powe
 	public PowerpointSlide getSlideFromXSLFSlide(XSLFSlide slide);
 
 	/**
+	 * Return the width of the slides, in points
+	 *
+	 * @return
+	 */
+	public double getPageWidth();
+
+	/**
+	 * Return the height of the slides, in points
+	 *
+	 * @return
+	 */
+	public double getPageHeight();
+
+	/**
 	 * Default base implementation for {@link PowerpointSlideshow}
 	 *
 	 * @author sylvain
@@ -143,6 +158,16 @@ public interface PowerpointSlideshow extends PowerpointObject, ResourceData<Powe
 
 		@SuppressWarnings("unused")
 		private static final Logger logger = Logger.getLogger(PowerpointSlideshowImpl.class.getPackage().getName());
+
+		@Override
+		public double getPageWidth() {
+			return getSlideShow() != null ? getSlideShow().getPageSize().getWidth() : 0;
+		}
+
+		@Override
+		public double getPageHeight() {
+			return getSlideShow() != null ? getSlideShow().getPageSize().getHeight() : 0;
+		}
 
 		@Override
 		public PowerpointSlideshow getResourceData() {

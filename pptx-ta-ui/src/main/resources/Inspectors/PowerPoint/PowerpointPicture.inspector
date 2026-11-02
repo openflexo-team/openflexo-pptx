@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointPicture"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="content_type" index="600" localize="true" name="ContentTypeLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=600;location=left)" />
+			<TextField index="600" data="data.contentType" readOnly="true" columns="10" localize="true" name="ContentType"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=600;location=right)" />
+			<Label label="file_name" index="601" localize="true" name="FileNameLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=601;location=left)" />
+			<TextField index="601" data="data.pictureFileName" readOnly="true" columns="10" localize="true" name="FileName"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=601;location=right)" />
+			<Label label="image" index="602" localize="true" name="ImageLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=602;location=left)" />
+			<Image index="602" data="data.image" sizeAdjustment="FitToAvailableSizeRespectRatio" imageWidth="160" imageHeight="120" align="left" localize="true" name="Image"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=602;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="content_type" lang="English" value="content type" />
+		<Localized key="content_type" lang="French" value="format" />
+		<Localized key="file_name" lang="English" value="file name" />
+		<Localized key="file_name" lang="French" value="fichier" />
+		<Localized key="image" lang="English" value="image" />
+		<Localized key="image" lang="French" value="image" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Picture" />
+</Panel>

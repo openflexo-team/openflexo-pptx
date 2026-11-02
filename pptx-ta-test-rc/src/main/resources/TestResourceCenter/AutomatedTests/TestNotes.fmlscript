@@ -1,0 +1,13 @@
+// Use case: read the speaker notes of the slides (PPTX-F-1).
+// In ShipFast-Picker-Training-Module2.pptx, the answer of the quiz of slide 10 is only given in the speaker notes;
+// the slide number of the notes page is not part of the notes.
+
+ppt = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Business/ShipFast-Picker-Training-Module2.pptx"];
+quiz = ppt.powerpointSlides.get(9);
+// (the note holds double quotes, that a script string cannot hold: only its beginning is checked)
+notes = quiz.notes;
+assert notes.startsWith("Correct answer: C. If the item does not match, never pick a ");
+assert notes.endsWith(" one: the customer ordered that SKU.");
+
+aeol = load -r ["http://openflexo.org/ppt-test/TestResourceCenter/PPT/Business/AeolWind-Public-Consultation.pptx"];
+assert aeol.powerpointSlides.get(0).notes == "Thank the mayor for hosting. Remind the audience that questions are welcome at any time.";

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Panel className="org.openflexo.gina.utils.FIBInspector" layout="border"
+	titleFont="SansSerif,0,12" darkLevel="0"
+	dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointLine"
+	controllerClassName="org.openflexo.inspector.FIBInspectorController"
+	font="SansSerif,0,12" name="Inspector">
+	<TabPanel name="Tab" constraints="border(location=center)">
+		<Tab title="Basic" layout="twocols" titleFont="SansSerif,0,11"
+			darkLevel="0" index="0" font="SansSerif,0,11" useScrollBar="true"
+			horizontalScrollbarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+			verticalScrollbarPolicy="VERTICAL_SCROLLBAR_AS_NEEDED" name="BasicTab">
+			<Label label="start_decoration" index="700" localize="true" name="HeadDecorationLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=700;location=left)" />
+			<TextField index="700" data="data.headDecoration" readOnly="true" columns="10" localize="true" name="HeadDecoration"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=700;location=right)" />
+			<Label label="end_decoration" index="701" localize="true" name="TailDecorationLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=701;location=left)" />
+			<TextField index="701" data="data.tailDecoration" readOnly="true" columns="10" localize="true" name="TailDecoration"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=701;location=right)" />
+			<Label label="start_shape" index="702" localize="true" name="StartShapeLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=702;location=left)" />
+			<TextField index="702" data="data.startShape.name" readOnly="true" columns="10" localize="true" name="StartShape"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=702;location=right)" />
+			<Label label="start_site" index="703" localize="true" name="StartSiteLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=703;location=left)" />
+			<Number numberType="IntegerType" index="703" data="data.startConnectionSite" readOnly="true" columns="10" localize="true" name="StartSite"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=703;location=right)" />
+			<Label label="end_shape" index="704" localize="true" name="EndShapeLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=704;location=left)" />
+			<TextField index="704" data="data.endShape.name" readOnly="true" columns="10" localize="true" name="EndShape"
+				constraints="twocols(expandHorizontally=true;expandVertically=false;index=704;location=right)" />
+			<Label label="end_site" index="705" localize="true" name="EndSiteLabel"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=705;location=left)" />
+			<Number numberType="IntegerType" index="705" data="data.endConnectionSite" readOnly="true" columns="10" localize="true" name="EndSite"
+				constraints="twocols(expandHorizontally=false;expandVertically=false;index=705;location=right)" />
+		</Tab>
+	</TabPanel>
+	<LocalizedDictionary>
+		<Localized key="Basic" lang="French" value="Basique" />
+		<Localized key="end_decoration" lang="English" value="end" />
+		<Localized key="end_decoration" lang="French" value="fin" />
+		<Localized key="start_decoration" lang="English" value="start" />
+		<Localized key="start_decoration" lang="French" value="début" />
+		<Localized key="start_shape" lang="English" value="glued at start to" />
+		<Localized key="start_shape" lang="French" value="collé au début à" />
+		<Localized key="start_site" lang="English" value="start connection site" />
+		<Localized key="start_site" lang="French" value="site de connexion de début" />
+		<Localized key="end_shape" lang="English" value="glued at end to" />
+		<Localized key="end_shape" lang="French" value="collé à la fin à" />
+		<Localized key="end_site" lang="English" value="end connection site" />
+		<Localized key="end_site" lang="French" value="site de connexion de fin" />
+	</LocalizedDictionary>
+	<Parameter name="title" value="Line" />
+</Panel>

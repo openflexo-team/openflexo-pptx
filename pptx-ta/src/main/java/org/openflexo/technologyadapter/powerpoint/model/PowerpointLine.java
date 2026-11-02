@@ -40,8 +40,12 @@ package org.openflexo.technologyadapter.powerpoint.model;
 
 import java.util.logging.Logger;
 
+import org.apache.poi.xslf.usermodel.XSLFSimpleShape;
 import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTConnection;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTNonVisualConnectorProperties;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTConnector;
 
 /**
  * Represents a PowerPoint line / connector (backed by a POI XSLFConnectorShape).
@@ -54,6 +58,48 @@ import org.openflexo.pamela.annotations.ModelEntity;
 public interface PowerpointLine extends PowerpointSimpleShape {
 
 	/**
+	 * Return the decoration at the start of the line (for instance TRIANGLE), or null when there is none
+	 *
+	 * @return
+	 */
+	public String getHeadDecoration();
+
+	/**
+	 * Return the decoration at the end of the line (for instance TRIANGLE), or null when there is none
+	 *
+	 * @return
+	 */
+	public String getTailDecoration();
+
+	/**
+	 * Return the shape the start of this connector is glued to, or null
+	 *
+	 * @return
+	 */
+	public PowerpointShape getStartShape();
+
+	/**
+	 * Return the shape the end of this connector is glued to, or null
+	 *
+	 * @return
+	 */
+	public PowerpointShape getEndShape();
+
+	/**
+	 * Return the index of the connection site of {@link #getStartShape()} the connector is glued to, or -1
+	 *
+	 * @return
+	 */
+	public int getStartConnectionSite();
+
+	/**
+	 * Return the index of the connection site of {@link #getEndShape()} the connector is glued to, or -1
+	 *
+	 * @return
+	 */
+	public int getEndConnectionSite();
+
+	/**
 	 * Default base implementation for {@link PowerpointLine}
 	 *
 	 * @author sylvain
@@ -63,6 +109,69 @@ public interface PowerpointLine extends PowerpointSimpleShape {
 
 		@SuppressWarnings("unused")
 		private static final Logger logger = Logger.getLogger(PowerpointLineImpl.class.getPackage().getName());
+
+		private CTNonVisualConnectorProperties getConnectorProperties() {
+			if (getShape() != null && getShape().getXmlObject() instanceof CTConnector) {
+				CTConnector connector = (CTConnector) getShape().getXmlObject();
+				if (connector.getNvCxnSpPr() != null) {
+					return connector.getNvCxnSpPr().getCNvCxnSpPr();
+				}
+			}
+			return null;
+		}
+
+		private CTConnection getStartConnection() {
+			CTNonVisualConnectorProperties properties = getConnectorProperties();
+			return properties != null && properties.isSetStCxn() ? properties.getStCxn() : null;
+		}
+
+		private CTConnection getEndConnection() {
+			CTNonVisualConnectorProperties properties = getConnectorProperties();
+			return properties != null && properties.isSetEndCxn() ? properties.getEndCxn() : null;
+		}
+
+		private PowerpointShape getConnectedShape(CTConnection connection) {
+			if (connection == null || getPowerpointSlide() == null) {
+				return null;
+			}
+			return getPowerpointSlide().getShapeWithId((int) connection.getId());
+		}
+
+		@Override
+		public PowerpointShape getStartShape() {
+			return getConnectedShape(getStartConnection());
+		}
+
+		@Override
+		public PowerpointShape getEndShape() {
+			return getConnectedShape(getEndConnection());
+		}
+
+		@Override
+		public int getStartConnectionSite() {
+			return getStartConnection() != null ? (int) getStartConnection().getIdx() : -1;
+		}
+
+		@Override
+		public int getEndConnectionSite() {
+			return getEndConnection() != null ? (int) getEndConnection().getIdx() : -1;
+		}
+
+		@Override
+		public String getHeadDecoration() {
+			if (getShape() instanceof XSLFSimpleShape && ((XSLFSimpleShape) getShape()).getLineHeadDecoration() != null) {
+				return ((XSLFSimpleShape) getShape()).getLineHeadDecoration().toString();
+			}
+			return null;
+		}
+
+		@Override
+		public String getTailDecoration() {
+			if (getShape() instanceof XSLFSimpleShape && ((XSLFSimpleShape) getShape()).getLineTailDecoration() != null) {
+				return ((XSLFSimpleShape) getShape()).getLineTailDecoration().toString();
+			}
+			return null;
+		}
 
 	}
 
