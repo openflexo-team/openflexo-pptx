@@ -1,0 +1,39 @@
+use org.openflexo.technologyadapter.powerpoint.BasicPowerpointModelSlot as PPT;
+
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
+
+/**
+ * Annotates the slides and shapes of an existing presentation, without modifying it: each note points at an element of the
+ * presentation through a role, whose actor reference must be found again after a reload (PPTX-F-5).
+ */
+@URI("http://openflexo.org/ppt-test/TestResourceCenter/FML/ShapeAnnotations.fml")
+public model ShapeAnnotations {
+
+    public PowerpointSlideshow slideshow with PPT::BasicPowerpointModelSlot();
+
+    create(required Resource<PowerpointSlideshow> resource) {
+        connect slideshow using parameters.resource;
+    }
+
+    public concept ShapeNote {
+        public PowerpointShape shape with PPT::PowerpointShapeRole(container=slideshow);
+        public String label;
+
+        create(required PowerpointShape aShape, required String aLabel) {
+            shape = parameters.aShape;
+            label = parameters.aLabel;
+        }
+    }
+
+    public concept SlideNote {
+        public PowerpointSlide slide with PPT::PowerpointSlideRole(container=slideshow);
+        public String label;
+
+        create(required PowerpointSlide aSlide, required String aLabel) {
+            slide = parameters.aSlide;
+            label = parameters.aLabel;
+        }
+    }
+}

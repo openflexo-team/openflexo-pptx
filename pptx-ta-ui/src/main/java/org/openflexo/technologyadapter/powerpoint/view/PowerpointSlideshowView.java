@@ -68,6 +68,10 @@ import org.openflexo.view.controller.model.FlexoPerspective;
  * Module view of a {@link PowerpointSlideshow}: the shown slide in the center, zoomed to fit the available space, and the thumbnails of
  * all the slides on the right to choose it, in a split pane. A browser of the contents of the shown slide is put in the left side of the
  * perspective.
+ * <p>
+ * The view can be embedded by another module: it only relies on the {@link FlexoController} it is given (its selection manager, and the
+ * removal of the module view), and a {@link PowerpointElementDecorationProvider} installed with
+ * {@link #setDecorationProvider(PowerpointElementDecorationProvider)} paints that module's information over the elements of the slides.
  * 
  * @author vincent, sylvain
  * 
@@ -88,6 +92,8 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 	private PowerpointSlideView shownSlideView;
 
 	private final FlexoController controller;
+
+	private PowerpointElementDecorationProvider decorationProvider;
 
 	public PowerpointSlideshowView(PowerpointSlideshow slideshow, FlexoController controller, FlexoPerspective perspective) {
 		super(new BorderLayout());
@@ -146,6 +152,33 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 		}
 	}
 
+	/**
+	 * Return the view of supplied slide, or null when it is not a slide of this slideshow
+	 * 
+	 * @param slide
+	 * @return
+	 */
+	public PowerpointSlideView getSlideView(PowerpointSlide slide) {
+		int index = slideshow.getPowerpointSlides().indexOf(slide);
+		return index >= 0 && index < slideViews.size() ? slideViews.get(index) : null;
+	}
+
+	public PowerpointElementDecorationProvider getDecorationProvider() {
+		return decorationProvider;
+	}
+
+	/**
+	 * Install supplied decoration provider on every slide of this view (or remove the current one, when null)
+	 * 
+	 * @param provider
+	 */
+	public void setDecorationProvider(PowerpointElementDecorationProvider provider) {
+		decorationProvider = provider;
+		for (PowerpointSlideView slideView : slideViews) {
+			slideView.getEditor().getDrawing().setDecorationProvider(provider);
+		}
+	}
+
 	public PowerpointSlide getShownSlide() {
 		return shownSlideView != null ? shownSlideView.getSlide() : null;
 	}
@@ -173,6 +206,7 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 
 	@Override
 	public void deleteModuleView() {
+		setDecorationProvider(null);
 		for (PowerpointSlideView slideView : slideViews) {
 			slideView.delete();
 		}

@@ -43,3 +43,21 @@ Not reproducible on demand.
 decks were missing, the 8 resources were registered in the resource center, its folder, the repositories of the
 technology adapter and the resource manager. The browser node of the folder had missed the last registrations, made
 while it was being updated: GINA-D-6 (gina), fixed there.
+
+### PPTX-D-4 — `PowerpointShapeRole` typed as a slide  ·  `DONE`
+
+**Symptom.** `PowerpointShapeRole` extended `FlexoRole<PowerpointSlide>` and its type was `PowerpointSlide`: a role declared
+`PowerpointShape shape with PPT::PowerpointShapeRole()` was typed as a slide, so that assigning it a shape (the result of
+`AddPowerpointShape` or `select PowerpointShape from …`) mixed two types, and its actor reference was built for a slide.
+
+**Fix.** The role is a `FlexoRole<PowerpointShape>` of type `PowerpointShape`. No FML of the repository used it before; it is
+now exercised by `ShapeAnnotations.fml` (PPTX-F-5).
+
+### PPTX-D-5 — No actor reference of a PowerPoint role could be saved  ·  `DONE`
+
+**Symptom.** Assigning a slide or a shape to a `PowerpointSlideRole` / `PowerpointShapeRole` logged
+`Unknown entity 'org.openflexo.technologyadapter.powerpoint.BasicPowerpointModelSlotURIProcessor'`, and saving the instance then
+failed with a `NullPointerException` in `PowerpointActorReference.getObjectURI()`.
+
+**Cause (verified).** The model slot created its URI processor through the FML model factory, which does not know that PAMELA
+entity (and could not have built it: its only constructor took a parameter). The processor is now a plain helper class.

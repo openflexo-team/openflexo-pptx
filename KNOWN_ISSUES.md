@@ -25,9 +25,10 @@ POI 3.17), a PAMELA `@ModelEntity` model, a modern `PamelaResource` layer, and d
 ## FML surface
 - **`AddPowerpointSlide` ignores positional index.** XSLF appends new slides at the end; the
   `slideIndex` binding is accepted but not honored.
-- **Actor-reference URIs are session-stable only.** `PowerpointObject.getUri()` is hierarchical but
-  recomputed per load; it is not guaranteed stable across reloads, so persisted actor references to
-  individual slides/shapes are not round-trip stable.
+- **Actor-reference URIs rely on the identifiers of the file.** Since PPTX-F-5, `PowerpointObject.getUri()` is built from
+  the slide ids of `presentation.xml` and the shape ids (`cNvPr id`), so that persisted actor references survive a reload
+  and a reordering of the slides. An element whose id changes (deck regenerated, or renumbered by PowerPoint when two shapes
+  wrongly share an id, PPTX-D-1) is no longer found; rows, cells, paragraphs and series are designated by their index.
 - **Two model-slot levels kept.** `PowerpointModelSlot` (abstract) + `BasicPowerpointModelSlot`
   (concrete, FML-declared) were not consolidated into one.
 

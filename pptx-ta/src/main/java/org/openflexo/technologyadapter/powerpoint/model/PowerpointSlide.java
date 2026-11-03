@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.poi.sl.usermodel.Placeholder;
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
 import org.apache.poi.xslf.usermodel.XSLFNotes;
 import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSlide;
@@ -61,6 +62,8 @@ import org.openflexo.pamela.annotations.PropertyIdentifier;
 import org.openflexo.pamela.annotations.Remover;
 import org.openflexo.pamela.annotations.Setter;
 import org.openflexo.pamela.annotations.XMLElement;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideIdList;
+import org.openxmlformats.schemas.presentationml.x2006.main.CTSlideIdListEntry;
 
 /**
  * Represents a PowerPoint slide, as a PAMELA entity wrapping the POI {@link XSLFSlide} concept.
@@ -128,6 +131,16 @@ public interface PowerpointSlide extends PowerpointObject {
 	 * @return
 	 */
 	public int getSlideNumber();
+
+	/**
+	 * Return the identifier of this slide in its presentation (the <code>id</code> of its <code>p:sldId</code> in
+	 * <code>presentation.xml</code>), or -1.<br>
+	 * Unlike the slide number, this identifier does not change when the slides are reordered: it identifies the slide in the URI of its
+	 * elements.
+	 *
+	 * @return
+	 */
+	public long getSlideId();
 
 	/**
 	 * Return the title of this slide (text of the title placeholder), or null when there is none
@@ -238,6 +251,25 @@ public interface PowerpointSlide extends PowerpointObject {
 		}
 
 		@Override
+		public long getSlideId() {
+			if (getSlide() == null) {
+				return -1;
+			}
+			// presentation.xml lists the slides as <p:sldId id="256" r:id="rId2"/>: match the relation of this slide
+			XMLSlideShow slideShow = getSlide().getSlideShow();
+			String relationId = slideShow.getRelationId(getSlide());
+			CTSlideIdList slideIds = slideShow.getCTPresentation().getSldIdLst();
+			if (relationId != null && slideIds != null) {
+				for (CTSlideIdListEntry entry : slideIds.getSldIdArray()) {
+					if (relationId.equals(entry.getId2())) {
+						return entry.getId();
+					}
+				}
+			}
+			return -1;
+		}
+
+		@Override
 		public String getTitle() {
 			if (getSlide() == null) {
 				return null;
@@ -263,7 +295,7 @@ public interface PowerpointSlide extends PowerpointObject {
 		@Override
 		public String getUri() {
 			String parentUri = getPowerpointSlideshow() != null ? getPowerpointSlideshow().getUri() : "pptx:slideshow";
-			return parentUri + "/slide[" + getSlideNumber() + "]";
+			return parentUri + PowerpointObjectURI.PATH_SEPARATOR + PowerpointObjectURI.slideSegment(this);
 		}
 
 		@Override

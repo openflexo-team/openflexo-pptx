@@ -82,6 +82,28 @@ slide, and the other way round.
 in the browser, an empty area selects the slide, ESCAPE / ENTER move between a shape and its group, and a shape
 selected in the browser is selected in its slide.
 
+### PPTX-F-6 — Embed the slideshow view in another module  ·  `DONE`
+
+**Problem.** The FreeModellingEditor will show a presentation with `PowerpointSlideshowView` and an overlay: the user selects shapes
+and declares them as instances of concepts. The view offered no contextual menu, no way to paint over the elements, and the elements
+of a slideshow were not mapped to its view.
+
+**Done.**
+- A right click on the slide or on any of its elements (control-click as well, out of macOS) shows the contextual menu of the
+  selection, as in the diagram editors: the FlexoActions available on `Powerpoint*` objects appear there.
+- `PowerpointAdapterController`: a slide, a shape or any other element of a slideshow is represented in the view of its
+  `PowerpointSlideshow` (its master object).
+- `PowerpointElementDecorationProvider`: maps an element of a slide to an optional border color, fill tint (with the opacity of its
+  alpha) and badge text, painted on the transparent Diana shape covering the element; `refresh()` makes the views ask again. It is
+  installed with `PowerpointSlideshowView.setDecorationProvider(...)`. The view only relies on the `FlexoController` it is given
+  (selection manager, removal of the module view), so that a client module can build it with its own controller.
+
+**Checked** (`TestPowerpointElementDecorationProvider`). A provider changes the graphical representation of the shape it decorates
+(border, tint, badge), follows its refreshes, leaves the other shapes transparent, and is removed with the view.
+
+**Left.** The visuals are minimal on purpose: the exact rendering of the overlay will follow the screens of the FreeModellingEditor.
+The contextual menu was not tried in the running application.
+
 ## Model
 
 ### PPTX-F-2 — Reflect every element of the sample decks  ·  `DONE`
@@ -148,3 +170,33 @@ the pattern, then POI draws the rest of the shape), in the slide view and the th
 
 **Limits.** Pattern fills of table cells and theme or scheme colors of patterns are not handled (none in the samples).
 
+### PPTX-F-5 — Identify the elements of a slideshow across reloads  ·  `DONE`
+
+**Problem.** A VirtualModelInstance pointing at slides or shapes could not be reloaded: the URI of an element was a positional path
+(`<resource>/slide[n]/shape[i]`), and the model slot only resolved it from an in-memory cache, empty after a reload. A positional
+path would also designate another slide once the slides are reordered. The FreeModellingEditor needs this to annotate an existing
+presentation, one free model instance federating a whole slideshow.
+
+**Done.**
+- URIs built from the identifiers stored in the file (`PowerpointObjectURI`):
+  `<resource URI>#/slide[id=258]/shape[id=12]/shape[id=14]`. A slide is designated by the `id` of its `p:sldId` in
+  `presentation.xml` (`PowerpointSlide.slideId`, also usable from FML), a shape by its `cNvPr id`, under its group for a nested shape.
+  Shapes sharing an id with a sibling (PPTX-D-1) get their rank among those siblings, in document order (`shape[id=25,n=2]`). Rows,
+  cells, paragraphs and series keep an index inside their shape.
+- The model slot resolves a URI by navigating the loaded slideshow; its cache is only an optimization, checked against the current
+  slideshow. A shape moved into or out of a group is still found by its id when no other shape shares it. Positional URIs written
+  before are still resolved.
+- `ShapeAnnotations.fml` (pptx-ta-test-rc): concepts with a `PowerpointShapeRole` and a `PowerpointSlideRole`. A role finds its
+  model slot through its container: `PowerpointShape shape with PPT::PowerpointShapeRole(container=slideshow)`.
+
+**Checked** (`TestShapeActorReferenceReload`). An instance pointing at a shape nested in a group, at the two shapes sharing id 25 of
+CycloCity slide 8 and at the slide itself is saved, reloaded in a fresh service manager, then reloaded again after slide 8 was moved
+to the front of the deck: every note points at the same element. Every element of the 9 sample decks (4677 elements, 134 of them
+through a rank among siblings sharing an id) is found again from its URI.
+
+**Left.**
+- `PowerpointShapeRole` keeps the default behaviour of a created element (cloned with its concept, deleted with it): for an
+  annotation of an existing presentation, deleting the instance should leave the shape alone.
+- A `PowerpointActorReference` keeps the object it resolved: after the slideshow resource is unloaded and loaded again in the same
+  session, it still holds the former object.
+- An element whose id changed (a deck regenerated, or renumbered by PowerPoint because of PPTX-D-1) is no longer found.

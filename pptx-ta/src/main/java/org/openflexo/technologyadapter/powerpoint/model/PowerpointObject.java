@@ -66,8 +66,9 @@ public interface PowerpointObject extends FlexoObject, InnerResourceData<Powerpo
 	public String getName();
 
 	/**
-	 * Return a hierarchical URI identifying this object within its enclosing presentation.<br>
-	 * URIs are stable within a load session (used by the model slot to resolve actor references).
+	 * Return a URI identifying this object within its enclosing presentation, built from the identifiers stored in the file, so that it
+	 * survives a reload and a reordering of the slides (used by the model slot to resolve actor references).<br>
+	 * See {@link PowerpointObjectURI} for its syntax.
 	 *
 	 * @return
 	 */

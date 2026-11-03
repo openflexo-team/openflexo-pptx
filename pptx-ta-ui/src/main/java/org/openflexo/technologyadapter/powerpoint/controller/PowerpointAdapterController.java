@@ -48,6 +48,7 @@ import org.openflexo.technologyadapter.powerpoint.PowerpointTechnologyAdapter;
 import org.openflexo.technologyadapter.powerpoint.fml.PowerpointShapeRole;
 import org.openflexo.technologyadapter.powerpoint.fml.PowerpointSlideRole;
 import org.openflexo.technologyadapter.powerpoint.gui.PowerpointIconLibrary;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointObject;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
@@ -130,15 +131,22 @@ public class PowerpointAdapterController extends TechnologyAdapterController<Pow
 		return null;
 	}
 
+	/**
+	 * Every element of a slideshow is shown in the view of its slideshow
+	 */
 	@Override
 	public boolean isRepresentableInModuleView(TechnologyObject<PowerpointTechnologyAdapter> object) {
-		return object instanceof PowerpointSlideshow;
+		return object instanceof PowerpointObject && ((PowerpointObject) object).getResourceData() != null;
 	}
-	
+
+	/**
+	 * Return the {@link PowerpointSlideshow} containing supplied object (a slide, a shape or any other element of a slide), or the object
+	 * itself when it is not located in a slideshow
+	 */
 	@Override
 	public FlexoObject getRepresentableMasterObject(TechnologyObject<PowerpointTechnologyAdapter> object) {
-		if (object instanceof PowerpointSlideshow) {
-			return object;
+		if (object instanceof PowerpointObject && ((PowerpointObject) object).getResourceData() != null) {
+			return ((PowerpointObject) object).getResourceData();
 		}
 		return object;
 	}

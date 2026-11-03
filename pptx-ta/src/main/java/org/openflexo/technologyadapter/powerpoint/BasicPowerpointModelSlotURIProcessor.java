@@ -39,133 +39,61 @@
 package org.openflexo.technologyadapter.powerpoint;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.openflexo.connie.BindingModel;
-import org.openflexo.foundation.fml.FlexoConcept;
-import org.openflexo.foundation.fml.FlexoConceptObject;
-import org.openflexo.pamela.annotations.ImplementationClass;
-import org.openflexo.pamela.annotations.ModelEntity;
-import org.openflexo.pamela.annotations.XMLElement;
-import org.openflexo.pamela.validation.Validable;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointObject;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointObjectURI;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
 
-@ModelEntity
-@ImplementationClass(BasicPowerpointModelSlotURIProcessor.BasicPowerpointModelSlotURIProcessorImpl.class)
-@XMLElement
-public interface BasicPowerpointModelSlotURIProcessor extends FlexoConceptObject {
+/**
+ * Computes the URIs stored by the actor references of a {@link BasicPowerpointModelSlot}, and finds an object again from its URI.<br>
+ * A URI is the URI of the object (see {@link PowerpointObjectURI}), URL-encoded.
+ * 
+ * @author sylvain
+ *
+ */
+public class BasicPowerpointModelSlotURIProcessor {
 
-	public String getURIForObject(PowerpointSlideshow resourceData, PowerpointObject powerpointObject);
+	private static final Logger logger = Logger.getLogger(BasicPowerpointModelSlotURIProcessor.class.getPackage().getName());
 
-	// get the Object given the URI
-	public Object retrieveObjectWithURI(PowerpointSlideshow resourceData, String objectURI) throws Exception;
+	// An optimization only: an object is always found again from its URI, see retrieveObjectWithURI()
+	private final Map<String, PowerpointObject> uriCache = new HashMap<>();
 
-	public BasicPowerpointModelSlot getModelSlot();
-
-	public void setModelSlot(BasicPowerpointModelSlot powerpointModelSlot);
-
-	public static abstract class BasicPowerpointModelSlotURIProcessorImpl extends FlexoConceptObjectImpl
-			implements BasicPowerpointModelSlotURIProcessor {
-
-		private static final Logger logger = Logger.getLogger(BasicPowerpointModelSlotURIProcessor.class.getPackage().getName());
-
-		// Properties actually used to calculate URis
-		private BasicPowerpointModelSlot modelSlot;
-
-		// Cache des URis Pour aller plus vite ??
-		// TODO some optimization required
-		private final Map<String, PowerpointObject> uriCache = new HashMap<>();
-
-		public BasicPowerpointModelSlotURIProcessorImpl(String typeURI) {
-			super();
-			this.typeURI = URI.create(typeURI);
-		}
-
-		@Override
-		public FlexoConcept getFlexoConcept() {
-			return getModelSlot().getFlexoConcept();
-		}
-
-		@Override
-		public BasicPowerpointModelSlot getModelSlot() {
-			return modelSlot;
-		}
-
-		@Override
-		public void setModelSlot(BasicPowerpointModelSlot powerpointModelSlot) {
-			modelSlot = powerpointModelSlot;
-		}
-
-		// Serialized properties
-
-		protected URI typeURI;
-		protected String attributeName;
-
-		public String _getTypeURI() {
-			return typeURI.toString();
-		}
-
-		public void _setTypeURI(String name) {
-			typeURI = URI.create(name);
-		}
-
-		public String _getAttributeName() {
-			return attributeName;
-		}
-
-		public void _setAttributeName(String attributeName) {
-			this.attributeName = attributeName;
-		}
-
-		// Lifecycle management methods
-		public void reset() {
-			modelSlot = null;
-		}
-
-		// URI Calculation
-
-		@Override
-		public String getURIForObject(PowerpointSlideshow resourceData, PowerpointObject powerpointObject) {
-			String builtURI = null;
-
-			try {
-				builtURI = URLEncoder.encode(powerpointObject.getUri(), "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				logger.log(java.util.logging.Level.WARNING, "Cannot process URI - Unexpected encoding error", e);
-			}
-
-			if (builtURI != null) {
-				if (uriCache.get(builtURI) == null) {
-					// TODO Manage the fact that URI May Change
-					uriCache.put(builtURI, powerpointObject);
-				}
-			}
-			return builtURI.toString();
-		}
-
-		// get the Object given the URI
-		@Override
-		public Object retrieveObjectWithURI(PowerpointSlideshow resourceData, String objectURI) throws Exception {
-			PowerpointObject o = uriCache.get(objectURI);
-			return o;
-		}
-
-		@Override
-		public BindingModel getBindingModel() {
+	public String getURIForObject(PowerpointSlideshow resourceData, PowerpointObject powerpointObject) {
+		try {
+			String builtURI = URLEncoder.encode(powerpointObject.getUri(), "UTF-8");
+			uriCache.put(builtURI, powerpointObject);
+			return builtURI;
+		} catch (UnsupportedEncodingException e) {
+			logger.log(Level.WARNING, "Cannot process URI - Unexpected encoding error", e);
 			return null;
 		}
-
-		@Override
-		public Collection<Validable> getEmbeddedValidableObjects() {
-			return Collections.emptyList();
-		}
-
 	}
+
+	/**
+	 * Return the object designated by supplied URI in supplied presentation.<br>
+	 * The URI is resolved by navigating the presentation (see {@link PowerpointObjectURI}), so that it is found again after a reload. A
+	 * cached object is only returned when it still belongs to supplied presentation: after a reload, the cache holds the objects of the
+	 * former one.
+	 */
+	public PowerpointObject retrieveObjectWithURI(PowerpointSlideshow resourceData, String objectURI) throws UnsupportedEncodingException {
+		if (objectURI == null) {
+			return null;
+		}
+		PowerpointObject cached = uriCache.get(objectURI);
+		if (cached != null && !cached.isDeleted() && cached.getResourceData() == resourceData) {
+			return cached;
+		}
+		PowerpointObject returned = PowerpointObjectURI.resolve(resourceData, URLDecoder.decode(objectURI, "UTF-8"));
+		if (returned != null) {
+			uriCache.put(objectURI, returned);
+		}
+		return returned;
+	}
+
 }

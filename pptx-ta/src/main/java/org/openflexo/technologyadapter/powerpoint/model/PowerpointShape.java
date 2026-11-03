@@ -193,12 +193,13 @@ public interface PowerpointShape extends PowerpointSlideElement {
 		@Override
 		public String getUri() {
 			if (getContainer() != null) {
-				return getContainer().getUri() + "/shape[" + getContainer().getChildren().indexOf(this) + "]";
+				return getContainer().getUri() + PowerpointObjectURI.shapeSegment(this, getContainer().getChildren());
 			}
 			PowerpointSlide slide = getPowerpointSlide();
-			String parentUri = slide != null ? slide.getUri() : "pptx:slideshow";
-			int index = slide != null ? slide.getPowerpointShapes().indexOf(this) : -1;
-			return parentUri + "/shape[" + index + "]";
+			if (slide == null) {
+				return "pptx:slideshow" + PowerpointObjectURI.PATH_SEPARATOR + PowerpointObjectURI.shapeSegment(this, null);
+			}
+			return slide.getUri() + PowerpointObjectURI.shapeSegment(this, slide.getPowerpointShapes());
 		}
 
 		private Rectangle2D getAnchor() {

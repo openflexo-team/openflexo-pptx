@@ -38,11 +38,14 @@
 
 package org.openflexo.technologyadapter.powerpoint.view;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +58,7 @@ import org.apache.poi.xslf.usermodel.XSLFShape;
 import org.apache.poi.xslf.usermodel.XSLFSimpleShape;
 import org.apache.poi.xslf.usermodel.XSLFTable;
 import org.openflexo.diana.DianaCoreUtils;
+import org.openflexo.diana.BackgroundStyle;
 import org.openflexo.diana.DianaModelFactory;
 import org.openflexo.diana.DrawingGraphicalRepresentation;
 import org.openflexo.diana.GRBinding.DrawingGRBinding;
@@ -70,6 +74,7 @@ import org.openflexo.diana.graphics.DrawingDecorationPainter;
 import org.openflexo.diana.impl.DrawingImpl;
 import org.openflexo.diana.shapes.ShapeSpecification.ShapeType;
 import org.openflexo.diana.swing.graphics.JDianaGraphics;
+import org.openflexo.selection.SelectionManagingDianaEditor.ShowContextualMenuControl;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointParagraph;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShapeGroup;
@@ -79,6 +84,8 @@ import org.openflexo.technologyadapter.powerpoint.model.PowerpointTable;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointTableCell;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointTableRow;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointTextShape;
+import org.openflexo.technologyadapter.powerpoint.view.PowerpointElementDecorationProvider.Decoration;
+import org.openflexo.toolbox.ToolBox;
 
 /**
  * Diana drawing representing a {@link PowerpointSlide}.<br>
@@ -90,6 +97,9 @@ import org.openflexo.technologyadapter.powerpoint.model.PowerpointTextShape;
  * as the elements are: the shapes of a {@link PowerpointShapeGroup} in the shape of the group, the rows of a {@link PowerpointTable} in
  * the shape of the table, the cells in their row, and the paragraphs of a text with several paragraphs in the shape of the text (their
  * bounds come from the layout of POI, see {@link PowerpointDrawFactory#layoutParagraphs(PowerpointSlide)}).
+ * <p>
+ * A right click on the slide or on an element shows the contextual menu of the selection (the FlexoActions available on it). A
+ * {@link PowerpointElementDecorationProvider} may paint a decoration on the shape of each element.
  * 
  * @author sylvain
  * 
@@ -109,6 +119,13 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 	 */
 	private Map<Object, Rectangle2D> paragraphBounds;
 
+	/**
+	 * The decorations of the elements, or null. Like {@link #paragraphBounds}, it must have no initializer.
+	 */
+	private PowerpointElementDecorationProvider decorationProvider;
+
+	private PropertyChangeListener decorationListener;
+
 	public PowerpointSlideDrawing(PowerpointSlide slide) {
 		super(slide, DianaCoreUtils.TOOLS_FACTORY, PersistenceMode.UniqueGraphicalRepresentations);
 		setEditable(false);
@@ -123,6 +140,7 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 		drawingGR.setHeight(pageSize.getHeight());
 		drawingGR.setDrawWorkingArea(false);
 		drawingGR.setDecorationPainter(new SlidePainter());
+		addContextualMenuControls(drawingGR);
 
 		// The cells of a table get their location from their text: compute it before building the graphical representations
 		updateCellAnchors(getModel().getSlide().getShapes(), new HashSet<>());
@@ -285,7 +303,108 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 		returned.setIsFloatingLabel(false);
 		returned.setLocationConstraints(LocationConstraints.UNMOVABLE);
 		returned.setDimensionConstraints(DimensionConstraints.UNRESIZABLE);
+		addContextualMenuControls(returned);
+		applyDecoration(returned, element);
 		return returned;
+	}
+
+	/**
+	 * A right click (and control-click out of macOS) shows the contextual menu of the selection, as in the diagram editors
+	 * 
+	 * @param gr
+	 */
+	private void addContextualMenuControls(DrawingGraphicalRepresentation gr) {
+		gr.addToMouseClickControls(new ShowContextualMenuControl(getFactory().getEditingContext()));
+		if (!ToolBox.isMacOS()) {
+			gr.addToMouseClickControls(new ShowContextualMenuControl(getFactory().getEditingContext(), true));
+		}
+	}
+
+	private void addContextualMenuControls(ShapeGraphicalRepresentation gr) {
+		gr.addToMouseClickControls(new ShowContextualMenuControl(getFactory().getEditingContext()));
+		if (!ToolBox.isMacOS()) {
+			gr.addToMouseClickControls(new ShowContextualMenuControl(getFactory().getEditingContext(), true));
+		}
+	}
+
+	public PowerpointElementDecorationProvider getDecorationProvider() {
+		return decorationProvider;
+	}
+
+	/**
+	 * Install supplied provider (or none, when null): the elements get their decoration at once, and again at each
+	 * {@link PowerpointElementDecorationProvider#refresh()}
+	 * 
+	 * @param provider
+	 */
+	public void setDecorationProvider(PowerpointElementDecorationProvider provider) {
+		if (decorationProvider != null && decorationListener != null) {
+			decorationProvider.removePropertyChangeListener(decorationListener);
+		}
+		decorationProvider = provider;
+		if (provider != null) {
+			if (decorationListener == null) {
+				decorationListener = (PropertyChangeEvent evt) -> updateDecorations();
+			}
+			provider.addPropertyChangeListener(decorationListener);
+		}
+		updateDecorations();
+	}
+
+	/**
+	 * Ask again the decoration of every element shown
+	 */
+	public void updateDecorations() {
+		if (getRoot() != null) {
+			updateDecorations(getRoot());
+		}
+	}
+
+	private void updateDecorations(ContainerNode<?, ?> container) {
+		for (DrawingTreeNode<?, ?> node : container.getChildNodes()) {
+			if (node.getDrawable() instanceof PowerpointSlideElement
+					&& node.getGraphicalRepresentation() instanceof ShapeGraphicalRepresentation) {
+				applyDecoration((ShapeGraphicalRepresentation) node.getGraphicalRepresentation(),
+						(PowerpointSlideElement) node.getDrawable());
+			}
+			if (node instanceof ContainerNode) {
+				updateDecorations((ContainerNode<?, ?>) node);
+			}
+		}
+	}
+
+	/**
+	 * Paint the decoration of the element on its graphical representation, or make it transparent again when it has none
+	 */
+	private void applyDecoration(ShapeGraphicalRepresentation gr, PowerpointSlideElement element) {
+		Decoration decoration = decorationProvider != null ? decorationProvider.getDecoration(element) : null;
+		Color border = decoration != null ? decoration.getBorderColor() : null;
+		Color tint = decoration != null ? decoration.getFillTint() : null;
+		gr.setForeground(border != null ? getFactory().makeForegroundStyle(border, 2.0f) : getFactory().makeNoneForegroundStyle());
+		if (tint != null) {
+			BackgroundStyle background = getFactory().makeColoredBackground(new Color(tint.getRed(), tint.getGreen(), tint.getBlue()));
+			background.setUseTransparency(tint.getAlpha() < 255);
+			background.setTransparencyLevel(tint.getAlpha() / 255f);
+			gr.setBackground(background);
+		}
+		else {
+			gr.setBackground(getFactory().makeEmptyBackground());
+		}
+		String badge = decoration != null ? decoration.getBadge() : null;
+		gr.setText(badge);
+		if (badge != null) {
+			gr.setRelativeTextX(1.0);
+			gr.setRelativeTextY(0.0);
+		}
+	}
+
+	@Override
+	public void delete() {
+		if (decorationProvider != null && decorationListener != null) {
+			decorationProvider.removePropertyChangeListener(decorationListener);
+		}
+		decorationProvider = null;
+		super.delete();
 	}
 
 	/**

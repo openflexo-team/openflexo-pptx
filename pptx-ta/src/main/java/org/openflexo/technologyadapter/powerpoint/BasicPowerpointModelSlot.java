@@ -85,8 +85,8 @@ public interface BasicPowerpointModelSlot extends PowerpointModelSlot {
 		private BasicPowerpointModelSlotURIProcessor uriProcessor;
 
 		public BasicPowerpointModelSlotURIProcessor getUriProcessor() {
-			if (uriProcessor == null && getFMLModelFactory() != null) {
-				uriProcessor = getFMLModelFactory().newInstance(BasicPowerpointModelSlotURIProcessor.class);
+			if (uriProcessor == null) {
+				uriProcessor = new BasicPowerpointModelSlotURIProcessor();
 			}
 			return uriProcessor;
 		}

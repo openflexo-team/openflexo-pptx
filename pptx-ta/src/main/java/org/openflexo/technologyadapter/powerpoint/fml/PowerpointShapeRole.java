@@ -50,24 +50,24 @@ import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
 import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.technologyadapter.powerpoint.PowerpointTechnologyAdapter;
-import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
 
 @ModelEntity
 @ImplementationClass(PowerpointShapeRole.PowerpointShapePatternRoleImpl.class)
 @XMLElement
 @FML("PowerpointShapeRole")
-public interface PowerpointShapeRole extends FlexoRole<PowerpointSlide> {
+public interface PowerpointShapeRole extends FlexoRole<PowerpointShape> {
 
-	public static abstract class PowerpointShapePatternRoleImpl extends FlexoRoleImpl<PowerpointSlide> implements PowerpointShapeRole {
+	public static abstract class PowerpointShapePatternRoleImpl extends FlexoRoleImpl<PowerpointShape> implements PowerpointShapeRole {
 
 		@Override
 		public Type getType() {
-			return PowerpointSlide.class;
+			return PowerpointShape.class;
 		}
 
 		@Override
 		public String getTypeDescription() {
-			return PowerpointSlide.class.getSimpleName();
+			return PowerpointShape.class.getSimpleName();
 		}
 
 		/**
@@ -86,7 +86,7 @@ public interface PowerpointShapeRole extends FlexoRole<PowerpointSlide> {
 		}
 
 		@Override
-		public ActorReference<PowerpointSlide> makeActorReference(PowerpointSlide object, FlexoConceptInstance fci) {
+		public ActorReference<PowerpointShape> makeActorReference(PowerpointShape object, FlexoConceptInstance fci) {
 			AbstractVirtualModelInstanceModelFactory factory = fci.getFactory();
 			PowerpointActorReference returned = factory.newInstance(PowerpointActorReference.class);
 			returned.setFlexoRole(this);

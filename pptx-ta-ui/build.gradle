@@ -11,4 +11,7 @@ dependencies {
   // external dep
   // testing dep
   testImplementation flexoUiTest()
+  testImplementation flexoFoundationTest()
+  // Test resource center
+  testRuntimeOnly project(':pptx-ta-test-rc')
 }
