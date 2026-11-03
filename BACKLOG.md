@@ -61,6 +61,16 @@ slide, and the other way round.
   is given, so it never needs a scroll bar; the thumbnails are rendered again at the width of their column (room is
   kept for the vertical scroll bar, which only appears when the thumbnails do not fit in height; never a horizontal one).
 
+**Done (step 7, paragraphs).**
+- In the browser, a text box with a single paragraph shows that paragraph's text directly and has no child; one with
+  several paragraphs keeps its paragraphs as children.
+- In the slide, each non-empty paragraph of a text box with several paragraphs is a node of its own, nested in the
+  text box and selectable independently: a click selects the paragraph, ESCAPE its text box, ENTER the first paragraph.
+  Paragraph bounds come from the POI text layout (`PowerpointDrawFactory.layoutParagraphs`), taken from the left of
+  the laid-out text to the right inset of the text box. Checked on the 8 sample decks: 224 text boxes with several
+  paragraphs, 542 paragraphs, every one gets a node; a click at its centre selects it except where another shape is
+  drawn above it, or in a rotated text box (axis-aligned bounds of neighbouring paragraphs overlap).
+
 **Next steps.**
 - Rotated or flipped groups are not taken into account when placing their children.
 - Tables and charts (`p:graphicFrame`) are not in the model, so they cannot be selected.

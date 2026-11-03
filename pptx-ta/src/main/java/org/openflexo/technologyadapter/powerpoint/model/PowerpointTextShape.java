@@ -99,6 +99,14 @@ public interface PowerpointTextShape extends PowerpointSimpleShape {
 	public void updateParagraphs(PowerpointModelFactory factory);
 
 	/**
+	 * Return the first paragraph of this shape, or null when it has none (a binding can use it where
+	 * {@code paragraphs.get(0)} would throw on an empty list)
+	 *
+	 * @return
+	 */
+	public PowerpointParagraph getFirstParagraph();
+
+	/**
 	 * Return the text held by this shape
 	 *
 	 * @return
@@ -135,6 +143,11 @@ public interface PowerpointTextShape extends PowerpointSimpleShape {
 					addToParagraphs(paragraph);
 				}
 			}
+		}
+
+		@Override
+		public PowerpointParagraph getFirstParagraph() {
+			return getParagraphs().isEmpty() ? null : getParagraphs().get(0);
 		}
 
 		@Override

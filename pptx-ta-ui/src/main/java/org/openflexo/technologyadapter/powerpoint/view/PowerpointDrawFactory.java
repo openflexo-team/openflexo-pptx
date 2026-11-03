@@ -41,11 +41,17 @@ package org.openflexo.technologyadapter.powerpoint.view;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.poi.sl.draw.DrawBackground;
 import org.apache.poi.sl.draw.DrawConnectorShape;
@@ -54,6 +60,7 @@ import org.apache.poi.sl.draw.DrawFreeformShape;
 import org.apache.poi.sl.draw.DrawGraphicalFrame;
 import org.apache.poi.sl.draw.DrawShape;
 import org.apache.poi.sl.draw.DrawTextBox;
+import org.apache.poi.sl.draw.DrawTextParagraph;
 import org.apache.poi.sl.draw.DrawTextShape;
 import org.apache.poi.sl.draw.Drawable;
 import org.apache.poi.sl.draw.geom.Outline;
@@ -62,9 +69,12 @@ import org.apache.poi.sl.usermodel.ConnectorShape;
 import org.apache.poi.sl.usermodel.FreeformShape;
 import org.apache.poi.sl.usermodel.GraphicalFrame;
 import org.apache.poi.sl.usermodel.TextBox;
+import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.sl.usermodel.TextShape;
 import org.apache.poi.xslf.usermodel.XSLFBackground;
 import org.apache.poi.xslf.usermodel.XSLFShape;
+import org.apache.poi.xslf.usermodel.XSLFTextParagraph;
+import org.apache.poi.xslf.usermodel.XSLFTextShape;
 import org.apache.xmlbeans.XmlObject;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointChart;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
@@ -78,6 +88,7 @@ import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
  * which presentations rarely carry;</li>
  * <li>the pattern fills of the backgrounds and of the shapes, painted with {@link PowerpointPatternFill}: POI ignores them.</li>
  * </ul>
+ * It also lays out the paragraphs of a slide as POI draws them, to make them selectable ({@link #layoutParagraphs(PowerpointSlide)}).
  * Install it on a graphics before drawing the slide with {@link #install(Graphics2D, PowerpointSlide)}: charts are then drawn at their
  * place in z-order, inside groups as well.
  * 
@@ -86,10 +97,79 @@ import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
  */
 public class PowerpointDrawFactory extends DrawFactory {
 
+	private static final Logger logger = Logger.getLogger(PowerpointDrawFactory.class.getPackage().getName());
+
 	private final PowerpointSlide slide;
 
+	/**
+	 * When not null, the bounds of the paragraphs drawn are recorded there, by POI paragraph
+	 */
+	private final Map<Object, Rectangle2D> paragraphBounds;
+
 	public PowerpointDrawFactory(PowerpointSlide slide) {
+		this(slide, null);
+	}
+
+	private PowerpointDrawFactory(PowerpointSlide slide, Map<Object, Rectangle2D> paragraphBounds) {
 		this.slide = slide;
+		this.paragraphBounds = paragraphBounds;
+	}
+
+	/**
+	 * Lay out the text of the supplied slide as POI draws it, and return the bounds of each paragraph, in slide coordinates (points),
+	 * by POI paragraph. The slide is drawn once on an image outside of the screen; empty paragraphs have no bounds.
+	 * 
+	 * @param slide
+	 * @return
+	 */
+	public static Map<Object, Rectangle2D> layoutParagraphs(PowerpointSlide slide) {
+		Map<Object, Rectangle2D> returned = new IdentityHashMap<>();
+		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D graphics = image.createGraphics();
+		try {
+			graphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+			graphics.setRenderingHint(Drawable.DRAW_FACTORY, new PowerpointDrawFactory(slide, returned));
+			slide.getSlide().draw(graphics);
+		} catch (RuntimeException e) {
+			// Laying out is only used to select the paragraphs: a failure only leaves some of them without bounds
+			logger.log(Level.WARNING, "Could not lay out the paragraphs of slide " + slide.getName(), e);
+		} finally {
+			graphics.dispose();
+		}
+		return returned;
+	}
+
+	@Override
+	public DrawTextParagraph getDrawable(TextParagraph<?, ?, ?> textParagraph) {
+		if (paragraphBounds == null) {
+			return super.getDrawable(textParagraph);
+		}
+		// A paragraph recording where POI places it: setPosition() gives its top left corner, and draw() leaves its height in getY()
+		return new DrawTextParagraph(textParagraph) {
+			private double left;
+			private double top;
+
+			@Override
+			public void setPosition(double x, double y) {
+				super.setPosition(x, y);
+				left = x;
+				top = y;
+			}
+
+			@Override
+			public void draw(Graphics2D graphics) {
+				super.draw(graphics);
+				if (isEmptyParagraph() || !(paragraph instanceof XSLFTextParagraph)) {
+					return;
+				}
+				XSLFTextShape textShape = ((XSLFTextParagraph) paragraph).getParentShape();
+				Rectangle2D anchor = DrawShape.getAnchor(graphics, textShape);
+				double right = anchor != null ? anchor.getMaxX() - textShape.getInsets().right : left;
+				Rectangle2D bounds = new Rectangle2D.Double(left, top, Math.max(1, right - left), getY());
+				// The graphics carries the rotation and flips of the shape: bounds are kept in slide coordinates
+				paragraphBounds.put(paragraph, graphics.getTransform().createTransformedShape(bounds).getBounds2D());
+			}
+		};
 	}
 
 	/**

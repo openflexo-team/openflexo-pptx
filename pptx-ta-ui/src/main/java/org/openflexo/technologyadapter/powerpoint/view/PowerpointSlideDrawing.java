@@ -44,6 +44,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,6 +70,7 @@ import org.openflexo.diana.graphics.DrawingDecorationPainter;
 import org.openflexo.diana.impl.DrawingImpl;
 import org.openflexo.diana.shapes.ShapeSpecification.ShapeType;
 import org.openflexo.diana.swing.graphics.JDianaGraphics;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointParagraph;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShape;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointShapeGroup;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
@@ -76,6 +78,7 @@ import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideElement;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointTable;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointTableCell;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointTableRow;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointTextShape;
 
 /**
  * Diana drawing representing a {@link PowerpointSlide}.<br>
@@ -85,7 +88,8 @@ import org.openflexo.technologyadapter.powerpoint.model.PowerpointTableRow;
  * {@link PowerpointDrawFactory}). Each element of the slide is then represented by a transparent,
  * read-only Diana shape covering its bounds, which gives focus and selection without changing what is displayed. Diana shapes are nested
  * as the elements are: the shapes of a {@link PowerpointShapeGroup} in the shape of the group, the rows of a {@link PowerpointTable} in
- * the shape of the table, and the cells in their row.
+ * the shape of the table, the cells in their row, and the paragraphs of a text with several paragraphs in the shape of the text (their
+ * bounds come from the layout of POI, see {@link PowerpointDrawFactory#layoutParagraphs(PowerpointSlide)}).
  * 
  * @author sylvain
  * 
@@ -98,6 +102,12 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 	 * Minimal size (in points) of the area representing an element, so that a line or a connector remains clickable
 	 */
 	private static final double MIN_SIZE = 6.0;
+
+	/**
+	 * The bounds of the paragraphs of the slide, in slide coordinates, as laid out by POI. Assigned in {@link #init()}, which the
+	 * constructor of the super class calls: it must have no initializer, which would run afterwards and erase it.
+	 */
+	private Map<Object, Rectangle2D> paragraphBounds;
 
 	public PowerpointSlideDrawing(PowerpointSlide slide) {
 		super(slide, DianaCoreUtils.TOOLS_FACTORY, PersistenceMode.UniqueGraphicalRepresentations);
@@ -116,6 +126,7 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 
 		// The cells of a table get their location from their text: compute it before building the graphical representations
 		updateCellAnchors(getModel().getSlide().getShapes(), new HashSet<>());
+		paragraphBounds = PowerpointDrawFactory.layoutParagraphs(getModel());
 
 		final DrawingGRBinding<PowerpointSlide> slideBinding = bindDrawing(PowerpointSlide.class, "slide",
 				new DrawingGRProvider<PowerpointSlide>() {
@@ -137,6 +148,14 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 				new ShapeGRProvider<PowerpointTableRow>() {
 					@Override
 					public ShapeGraphicalRepresentation provideGR(PowerpointTableRow drawable, DianaModelFactory factory) {
+						return makeGraphicalRepresentation(drawable);
+					}
+				});
+
+		final ShapeGRBinding<PowerpointParagraph> paragraphBinding = bindShape(PowerpointParagraph.class, "paragraph",
+				new ShapeGRProvider<PowerpointParagraph>() {
+					@Override
+					public ShapeGraphicalRepresentation provideGR(PowerpointParagraph drawable, DianaModelFactory factory) {
 						return makeGraphicalRepresentation(drawable);
 					}
 				});
@@ -174,6 +193,14 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 				else if (shape instanceof PowerpointTable) {
 					for (PowerpointTableRow row : ((PowerpointTable) shape).getRows()) {
 						drawShape(rowBinding, row, shape);
+					}
+				}
+				else if (shape instanceof PowerpointTextShape && ((PowerpointTextShape) shape).getParagraphs().size() > 1) {
+					// The paragraphs of a text are selected one by one when there are several of them; empty ones are not laid out
+					for (PowerpointParagraph paragraph : ((PowerpointTextShape) shape).getParagraphs()) {
+						if (paragraph.getParagraph() != null && paragraphBounds.containsKey(paragraph.getParagraph())) {
+							drawShape(paragraphBinding, paragraph, shape);
+						}
 					}
 				}
 			}
@@ -222,6 +249,9 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 		if (element instanceof PowerpointTableCell) {
 			return ((PowerpointTableCell) element).getTableRow();
 		}
+		if (element instanceof PowerpointParagraph) {
+			return ((PowerpointParagraph) element).getTextShape();
+		}
 		return null;
 	}
 
@@ -264,7 +294,7 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 	 * @param element
 	 * @return
 	 */
-	private static Rectangle2D getBounds(PowerpointSlideElement element) {
+	private Rectangle2D getBounds(PowerpointSlideElement element) {
 		Rectangle2D bounds = null;
 		if (element instanceof PowerpointTable && ((PowerpointShape) element).getShape() != null) {
 			// The rows of a table may grow with their text beyond the frame of the table
@@ -276,11 +306,23 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 		}
 		if (element instanceof PowerpointShape && ((PowerpointShape) element).getShape() != null) {
 			bounds = getBounds(((PowerpointShape) element).getShape());
+			if (element instanceof PowerpointTextShape && ((PowerpointTextShape) element).getParagraphs().size() > 1) {
+				// A text overflowing its shape: the shape covers its paragraphs, that are nested in it
+				for (PowerpointParagraph paragraph : ((PowerpointTextShape) element).getParagraphs()) {
+					if (paragraphBounds != null && paragraphBounds.containsKey(paragraph.getParagraph())) {
+						bounds = bounds.createUnion(getBounds(paragraph));
+					}
+				}
+			}
 		}
 		else if (element instanceof PowerpointTableRow) {
 			for (PowerpointTableCell cell : ((PowerpointTableRow) element).getCells()) {
 				bounds = bounds == null ? getBounds(cell) : bounds.createUnion(getBounds(cell));
 			}
+		}
+		else if (element instanceof PowerpointParagraph && paragraphBounds != null
+				&& paragraphBounds.containsKey(((PowerpointParagraph) element).getParagraph())) {
+			bounds = enlarge(paragraphBounds.get(((PowerpointParagraph) element).getParagraph()));
 		}
 		else if (element instanceof PowerpointTableCell && ((PowerpointTableCell) element).getCell() != null) {
 			PowerpointTableCell cell = (PowerpointTableCell) element;

@@ -54,10 +54,10 @@
 		</BrowserElement>
 		<BrowserElement
 			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointTextShape"
-			label="textShape.name"
+			label="((textShape.paragraphs.size == 1) ? textShape.firstParagraph.name : textShape.name)"
 			icon="controller.iconForObject(textShape)" isEditable="false"
 			filtered="false" defaultVisible="true" name="textShape">
-			<Children data="textShape.paragraphs" name="paragraphs" />
+			<Children data="textShape.paragraphs" visible="(textShape.paragraphs.size &gt; 1)" name="paragraphs" />
 		</BrowserElement>
 		<BrowserElement
 			dataClassName="org.openflexo.technologyadapter.powerpoint.model.PowerpointParagraph"

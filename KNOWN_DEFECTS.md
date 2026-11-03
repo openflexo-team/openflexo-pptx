@@ -33,29 +33,13 @@ were invisible.
 **Cause.** Not a defect of the deck: its background is a pattern fill (`a:pattFill`, small grid), that POI does not
 paint. Fixed by PPTX-F-4.
 
-### PPTX-D-3 — A .pptx sometimes not found when the technology adapter is activated  ·  `TODO`
+### PPTX-D-3 — A .pptx sometimes not found when the technology adapter is activated  ·  `DONE`
 
-**Symptom.** Once (2026-11-02), after activating the PowerPoint technology adapter in the application run from Eclipse,
-the resource center `pptx-ta-test-rc/src/main/resources/TestResourceCenter` showed 7 of its 8 sample decks:
-`NordicEBikes-Design-Review-DR2.pptx` was missing. Not reproduced in about ten later runs: most likely a race.
+**Symptom.** After activating the PowerPoint technology adapter in the application, the folder `PPT/Business` of the
+resource center `pptx-ta-test-rc/src/main/resources/TestResourceCenter` sometimes showed 6 or 7 of its 8 sample decks.
+Not reproducible on demand.
 
-**Verified.**
-- Not the files: a resource center scanned in a test, on a copy of the folder and on the folder itself, finds the 8
-  decks, also with the PowerPoint lock files (`~$…pptx`, rejected by the factory) and with PowerPoint holding the decks.
-- Not a second resource center masking the first: the private resource center of the TA is not loaded under Eclipse.
-- No error in the logs of the session; they did not trace the registration of resources then.
-
-**Suspects (core, not proven).**
-- `ResourceRepositoryImpl.registerResource` adds to an unsynchronized `HashMap` and to the resource list of a
-  `RepositoryFolder`, from the thread that activates the technology, while the Swing thread may create the folders of
-  the repositories at the same time (`TechnologyAdapter.notifyRepositoryStructureChanged`, see CORE-D-25): a resource can
-  end up in a folder object that is then replaced, or be lost by a concurrent add.
-- `FileSystemBasedResourceCenterImpl.registeredResources` is an unsynchronized `HashMap` too, also written by the
-  directory watcher thread (the session followed modifications of the `Business` folder by PowerPoint).
-
-**To diagnose when it happens again.** Trace each step of a `.pptx` in `PowerpointSlideshowResourceFactory`
-(`isValidArtefact`, `retrieveResource`, `registerResource`, `unregisterResource`), `PowerpointSlideshowResourceImpl.delete`
-and `PowerpointTechnologyAdapter.resourceCenterHasBeenInitialized` (count of the repository at the end of the scan):
-no line, a rejection, an exception, or a removal each point to a different cause; a deck registered in the repository
-but absent from the browser points to the folder race above.
-
+**Cause (verified).** Not the technology adapter: inspected in the running application with a read-only agent while 2
+decks were missing, the 8 resources were registered in the resource center, its folder, the repositories of the
+technology adapter and the resource manager. The browser node of the folder had missed the last registrations, made
+while it was being updated: GINA-D-6 (gina), fixed there.
