@@ -71,18 +71,21 @@ public interface PowerpointShapeRole extends FlexoRole<PowerpointShape> {
 		}
 
 		/**
-		 * Encodes the default cloning strategy
+		 * A shape is an element of an existing presentation, which an instance annotates: cloning the instance references the same shape
 		 * 
 		 * @return
 		 */
 		@Override
 		public RoleCloningStrategy defaultCloningStrategy() {
-			return RoleCloningStrategy.Clone;
+			return RoleCloningStrategy.Reference;
 		}
 
+		/**
+		 * A shape is an element of an existing presentation, which an instance annotates: deleting the instance leaves the shape alone
+		 */
 		@Override
 		public boolean defaultBehaviourIsToBeDeleted() {
-			return true;
+			return false;
 		}
 
 		@Override

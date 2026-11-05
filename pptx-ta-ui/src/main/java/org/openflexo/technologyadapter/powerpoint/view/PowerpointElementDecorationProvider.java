@@ -104,7 +104,7 @@ public abstract class PowerpointElementDecorationProvider {
 		 * @param fillTint
 		 *            color painted over the element, with the opacity given by its alpha (a color with no alpha would hide the element)
 		 * @param badge
-		 *            short text shown at the top right corner of the element
+		 *            short text shown in the middle of the element, over its contents
 		 */
 		public Decoration(Color borderColor, Color fillTint, String badge) {
 			this.borderColor = borderColor;

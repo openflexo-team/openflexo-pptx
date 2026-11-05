@@ -42,6 +42,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.swing.AbstractAction;
 import javax.swing.InputMap;
@@ -52,8 +53,10 @@ import org.openflexo.diana.DianaCoreUtils;
 import org.openflexo.diana.Drawing.ContainerNode;
 import org.openflexo.diana.Drawing.DrawingTreeNode;
 import org.openflexo.diana.swing.control.SwingToolFactory;
+import org.openflexo.foundation.FlexoObject;
 import org.openflexo.selection.SelectionManagingDianaEditor;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
+import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideElement;
 import org.openflexo.view.controller.FlexoController;
 
 /**
@@ -66,6 +69,8 @@ import org.openflexo.view.controller.FlexoController;
  * 
  */
 public class PowerpointSlideEditor extends SelectionManagingDianaEditor<PowerpointSlide> {
+
+	private Function<FlexoObject, List<? extends PowerpointSlideElement>> representedElements;
 
 	public PowerpointSlideEditor(PowerpointSlide slide, FlexoController controller) {
 		super(new PowerpointSlideDrawing(slide), controller != null ? controller.getSelectionManager() : null, DianaCoreUtils.TOOLS_FACTORY,
@@ -122,6 +127,45 @@ public class PowerpointSlideEditor extends SelectionManagingDianaEditor<Powerpoi
 		DrawingTreeNode<?, ?> node = getSingleSelectedNode();
 		if (node instanceof ContainerNode && node != getDrawing().getRoot() && !((ContainerNode<?, ?>) node).getChildNodes().isEmpty()) {
 			setSelectedObject(((ContainerNode<?, ?>) node).getChildNodes().get(0));
+		}
+	}
+
+	public Function<FlexoObject, List<? extends PowerpointSlideElement>> getRepresentedElements() {
+		return representedElements;
+	}
+
+	/**
+	 * Install the elements of the slideshow that stand for an object selected elsewhere (an object of another module, chosen in a
+	 * browser): selecting that object selects them in this editor too, with their handles, while the selection of the application
+	 * keeps the object alone. Null, the default, or an empty list, leaves the editor to the elements selected themselves.
+	 * 
+	 * @param representedElements
+	 */
+	public void setRepresentedElements(Function<FlexoObject, List<? extends PowerpointSlideElement>> representedElements) {
+		this.representedElements = representedElements;
+	}
+
+	private List<? extends PowerpointSlideElement> getRepresentedElements(FlexoObject object) {
+		if (representedElements == null || object instanceof PowerpointSlideElement || object == null) {
+			return Collections.emptyList();
+		}
+		List<? extends PowerpointSlideElement> returned = representedElements.apply(object);
+		return returned != null ? returned : Collections.emptyList();
+	}
+
+	@Override
+	public void fireObjectSelected(FlexoObject object) {
+		super.fireObjectSelected(object);
+		for (PowerpointSlideElement element : getRepresentedElements(object)) {
+			super.fireObjectSelected(element);
+		}
+	}
+
+	@Override
+	public void fireObjectDeselected(FlexoObject object) {
+		super.fireObjectDeselected(object);
+		for (PowerpointSlideElement element : getRepresentedElements(object)) {
+			super.fireObjectDeselected(element);
 		}
 	}
 

@@ -44,6 +44,7 @@ import java.awt.CardLayout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.function.Function;
 
 import javax.swing.JPanel;
 
@@ -66,18 +67,28 @@ import org.openflexo.view.controller.model.FlexoPerspective;
 
 /**
  * Module view of a {@link PowerpointSlideshow}: the shown slide in the center, zoomed to fit the available space, and the thumbnails of
- * all the slides on the right to choose it, in a split pane. A browser of the contents of the shown slide is put in the left side of the
+ * all the slides to choose it, in a split pane. The thumbnails are a column on the right by default, or a row at the top or at the bottom
+ * ({@link ThumbnailsPosition}). A browser of the contents of the shown slide is put in the left side of the
  * perspective.
  * <p>
  * The view can be embedded by another module: it only relies on the {@link FlexoController} it is given (its selection manager, and the
  * removal of the module view), and a {@link PowerpointElementDecorationProvider} installed with
  * {@link #setDecorationProvider(PowerpointElementDecorationProvider)} paints that module's information over the elements of the slides.
+ * Such a module may place the browser of the shown slide ({@link #getSlideBrowser()}) itself, after {@link #setInstallsBrowser(boolean)}
+ * with false.
  * 
  * @author vincent, sylvain
  * 
  */
 @SuppressWarnings("serial")
 public class PowerpointSlideshowView extends JPanel implements SelectionSynchronizedModuleView<PowerpointSlideshow> {
+
+	/**
+	 * Where the thumbnails of the slides are placed around the shown slide
+	 */
+	public enum ThumbnailsPosition {
+		RIGHT, TOP, BOTTOM
+	}
 
 	private final PowerpointSlideshow slideshow;
 	private final FlexoPerspective declaredPerspective;
@@ -95,9 +106,19 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 
 	private PowerpointElementDecorationProvider decorationProvider;
 
+	private boolean installsBrowser = true;
+
+	private final ThumbnailsPosition thumbnailsPosition;
+
 	public PowerpointSlideshowView(PowerpointSlideshow slideshow, FlexoController controller, FlexoPerspective perspective) {
+		this(slideshow, controller, perspective, ThumbnailsPosition.RIGHT);
+	}
+
+	public PowerpointSlideshowView(PowerpointSlideshow slideshow, FlexoController controller, FlexoPerspective perspective,
+			ThumbnailsPosition thumbnailsPosition) {
 		super(new BorderLayout());
 		this.controller = controller;
+		this.thumbnailsPosition = thumbnailsPosition;
 		declaredPerspective = perspective;
 		this.slideshow = slideshow;
 		for (int i = 0; i < slideshow.getPowerpointSlides().size(); i++) {
@@ -105,7 +126,7 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 			slideViews.add(slideView);
 			slidesPanel.add(slideView, String.valueOf(i));
 		}
-		thumbnailsPanel = new PowerpointSlideThumbnailsPanel(slideshow, this::slideChosen);
+		thumbnailsPanel = new PowerpointSlideThumbnailsPanel(slideshow, this::slideChosen, thumbnailsPosition != ThumbnailsPosition.RIGHT);
 		add(makeSplitPane(), BorderLayout.CENTER);
 		browser = controller != null && !slideViews.isEmpty() ? new PowerpointSlideBrowser(slideViews.get(0).getSlide(), controller) : null;
 		if (!slideViews.isEmpty()) {
@@ -121,7 +142,18 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 		slideLeaf.setWeight(0.82);
 		Leaf<?> thumbnailsLeaf = factory.makeLeaf(THUMBNAILS_LEAF);
 		thumbnailsLeaf.setWeight(0.18);
-		root.setChildren(slideLeaf, factory.makeDivider(), thumbnailsLeaf);
+		switch (thumbnailsPosition) {
+			case TOP:
+				root.setRowLayout(false);
+				root.setChildren(thumbnailsLeaf, factory.makeDivider(), slideLeaf);
+				break;
+			case BOTTOM:
+				root.setRowLayout(false);
+				root.setChildren(slideLeaf, factory.makeDivider(), thumbnailsLeaf);
+				break;
+			default:
+				root.setChildren(slideLeaf, factory.makeDivider(), thumbnailsLeaf);
+		}
 		MultiSplitLayout layout = new MultiSplitLayout(root, factory);
 		layout.setLayoutByWeight(true);
 		layout.setLayoutMode(MultiSplitLayout.NO_MIN_SIZE_LAYOUT);
@@ -163,6 +195,34 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 		return index >= 0 && index < slideViews.size() ? slideViews.get(index) : null;
 	}
 
+	public ThumbnailsPosition getThumbnailsPosition() {
+		return thumbnailsPosition;
+	}
+
+	/**
+	 * The browser of the contents of the shown slide, which follows the shown slide, or null when the view has no controller
+	 */
+	public PowerpointSlideBrowser getSlideBrowser() {
+		return browser;
+	}
+
+	/**
+	 * Whether the view puts the browser of the shown slide in the bottom-left view of its perspective when it is shown, and removes it
+	 * when it is hidden (the default)
+	 */
+	public boolean getInstallsBrowser() {
+		return installsBrowser;
+	}
+
+	/**
+	 * A module embedding the view, which places the browser of the shown slide ({@link #getSlideBrowser()}) itself, turns this off
+	 * 
+	 * @param installsBrowser
+	 */
+	public void setInstallsBrowser(boolean installsBrowser) {
+		this.installsBrowser = installsBrowser;
+	}
+
 	public PowerpointElementDecorationProvider getDecorationProvider() {
 		return decorationProvider;
 	}
@@ -176,6 +236,18 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 		decorationProvider = provider;
 		for (PowerpointSlideView slideView : slideViews) {
 			slideView.getEditor().getDrawing().setDecorationProvider(provider);
+		}
+	}
+
+	/**
+	 * Install on every slide of this view the elements that stand for an object selected elsewhere: see
+	 * {@link PowerpointSlideEditor#setRepresentedElements(Function)}
+	 * 
+	 * @param representedElements
+	 */
+	public void setRepresentedElements(Function<FlexoObject, List<? extends PowerpointSlideElement>> representedElements) {
+		for (PowerpointSlideView slideView : slideViews) {
+			slideView.getEditor().setRepresentedElements(representedElements);
 		}
 	}
 
@@ -228,7 +300,7 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 
 	@Override
 	public void willHide() {
-		if (browser != null && getPerspective() != null) {
+		if (installsBrowser && browser != null && getPerspective() != null) {
 			getPerspective().setBottomLeftView(null);
 		}
 	}
@@ -236,7 +308,7 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 	@Override
 	public void willShow() {
 		// The contents of the slideshow are shown in the left side of the perspective
-		if (browser != null && getPerspective() != null) {
+		if (installsBrowser && browser != null && getPerspective() != null) {
 			getPerspective().setBottomLeftView(browser);
 		}
 	}

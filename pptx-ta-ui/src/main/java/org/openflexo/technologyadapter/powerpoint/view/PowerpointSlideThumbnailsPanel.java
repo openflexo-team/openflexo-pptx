@@ -67,9 +67,11 @@ import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
 
 /**
- * Vertical list of the thumbnails of the slides of a {@link PowerpointSlideshow}, used to choose the slide to show.<br>
- * Thumbnails are rendered by POI the first time they are displayed, then cached. Their width follows the width of the panel: room is
- * always kept for the vertical scroll bar, so that its appearance does not change the width again, and there is never a horizontal one.
+ * List of the thumbnails of the slides of a {@link PowerpointSlideshow}, used to choose the slide to show: a column (the default), or a
+ * row.<br>
+ * Thumbnails are rendered by POI the first time they are displayed, then cached. In a column their width follows the width of the panel,
+ * in a row their height follows its height: room is always kept for the scroll bar, so that its appearance does not change that size
+ * again, and there is never a scroll bar in the other direction.
  * 
  * @author sylvain
  * 
@@ -105,25 +107,47 @@ public class PowerpointSlideThumbnailsPanel extends JPanel {
 	private final JScrollPane scrollPane;
 	private final Timer resizeTimer;
 	private int thumbnailWidth = 160;
+	private final boolean horizontal;
 
 	/**
+	 * Build a column of thumbnails
+	 * 
 	 * @param slideshow
 	 *            the slideshow whose slides are listed
 	 * @param slideChooser
 	 *            called with the slide chosen by the user
 	 */
 	public PowerpointSlideThumbnailsPanel(PowerpointSlideshow slideshow, Consumer<PowerpointSlide> slideChooser) {
+		this(slideshow, slideChooser, false);
+	}
+
+	/**
+	 * @param slideshow
+	 *            the slideshow whose slides are listed
+	 * @param slideChooser
+	 *            called with the slide chosen by the user
+	 * @param horizontal
+	 *            true for a row of thumbnails, false for a column
+	 */
+	public PowerpointSlideThumbnailsPanel(PowerpointSlideshow slideshow, Consumer<PowerpointSlide> slideChooser, boolean horizontal) {
 		super(new BorderLayout());
 		this.slideshow = slideshow;
+		this.horizontal = horizontal;
 		list = new JList<>(slideshow.getPowerpointSlides().toArray(new PowerpointSlide[0]));
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		if (horizontal) {
+			list.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+			list.setVisibleRowCount(1);
+		}
 		list.setCellRenderer(new ThumbnailRenderer());
 		list.addListSelectionListener(e -> {
 			if (!e.getValueIsAdjusting() && !updatingSelection && list.getSelectedValue() != null) {
 				slideChooser.accept(list.getSelectedValue());
 			}
 		});
-		scrollPane = new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane = horizontal
+				? new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED)
+				: new JScrollPane(list, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		add(scrollPane, BorderLayout.CENTER);
 		resizeTimer = new Timer(RESIZE_DELAY, e -> adjustThumbnailWidth());
 		resizeTimer.setRepeats(false);
@@ -135,14 +159,29 @@ public class PowerpointSlideThumbnailsPanel extends JPanel {
 		});
 	}
 
+	public boolean isHorizontal() {
+		return horizontal;
+	}
+
 	/**
-	 * Compute the width of the thumbnails from the width of the panel, and render them again when it changed
+	 * Compute the width of the thumbnails from the size of the panel (its width for a column, its height for a row), and render them
+	 * again when it changed
 	 */
 	public void adjustThumbnailWidth() {
-		int numberWidth = list.getFontMetrics(list.getFont()).stringWidth(String.valueOf(slideshow.getPowerpointSlides().size()));
-		int available = scrollPane.getWidth() - scrollPane.getInsets().left - scrollPane.getInsets().right
-				- scrollPane.getVerticalScrollBar().getPreferredSize().width - CELL_BORDERS - numberWidth - ICON_TEXT_GAP;
-		int newWidth = Math.max(MIN_THUMBNAIL_WIDTH, available);
+		int newWidth;
+		if (horizontal) {
+			int available = scrollPane.getHeight() - scrollPane.getInsets().top - scrollPane.getInsets().bottom
+					- scrollPane.getHorizontalScrollBar().getPreferredSize().height - CELL_BORDERS;
+			double pageWidth = slideshow.getPageWidth();
+			double pageHeight = slideshow.getPageHeight();
+			newWidth = Math.max(MIN_THUMBNAIL_WIDTH, pageHeight > 0 ? (int) Math.floor(available * pageWidth / pageHeight) : available);
+		}
+		else {
+			int numberWidth = list.getFontMetrics(list.getFont()).stringWidth(String.valueOf(slideshow.getPowerpointSlides().size()));
+			int available = scrollPane.getWidth() - scrollPane.getInsets().left - scrollPane.getInsets().right
+					- scrollPane.getVerticalScrollBar().getPreferredSize().width - CELL_BORDERS - numberWidth - ICON_TEXT_GAP;
+			newWidth = Math.max(MIN_THUMBNAIL_WIDTH, available);
+		}
 		if (newWidth != thumbnailWidth) {
 			thumbnailWidth = newWidth;
 			thumbnails.clear();

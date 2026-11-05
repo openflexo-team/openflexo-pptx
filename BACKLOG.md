@@ -101,6 +101,14 @@ of a slideshow were not mapped to its view.
 **Checked** (`TestPowerpointElementDecorationProvider`). A provider changes the graphical representation of the shape it decorates
 (border, tint, badge), follows its refreshes, leaves the other shapes transparent, and is removed with the view.
 
+**Done (2026-11-03, for FME-F-2).** A module embedding the view may place the browser of the shown slide itself:
+`getSlideBrowser()`, and `setInstallsBrowser(false)` so that the view no longer puts it in the bottom-left view of the perspective.
+
+**Done (2026-11-04/05, for FME-F-2).** The thumbnails can be a row at the top or at the bottom of the shown slide
+(`ThumbnailsPosition`, the column on the right stays the default). `setRepresentedElements(...)` gives the elements standing for an
+object of the embedding module: selecting that object selects them in the editors of the slides, with their handles, and leaves the
+selection of the application unchanged.
+
 **Left.** The visuals are minimal on purpose: the exact rendering of the overlay will follow the screens of the FreeModellingEditor.
 The contextual menu was not tried in the running application.
 
@@ -195,8 +203,9 @@ to the front of the deck: every note points at the same element. Every element o
 through a rank among siblings sharing an id) is found again from its URI.
 
 **Left.**
-- `PowerpointShapeRole` keeps the default behaviour of a created element (cloned with its concept, deleted with it): for an
-  annotation of an existing presentation, deleting the instance should leave the shape alone.
+- Done (2026-11-03): `PowerpointShapeRole` no longer deletes its shape with the instance, and a cloned instance references the
+  same shape: a shape is an element of an existing presentation, which an instance annotates. `PowerpointSlideRole` keeps the
+  default behaviour.
 - A `PowerpointActorReference` keeps the object it resolved: after the slideshow resource is unloaded and loaded again in the same
   session, it still holds the former object.
 - An element whose id changed (a deck regenerated, or renumbered by PowerPoint because of PPTX-D-1) is no longer found.

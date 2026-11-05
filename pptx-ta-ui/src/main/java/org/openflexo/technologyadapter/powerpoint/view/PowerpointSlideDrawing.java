@@ -391,11 +391,8 @@ public class PowerpointSlideDrawing extends DrawingImpl<PowerpointSlide> {
 			gr.setBackground(getFactory().makeEmptyBackground());
 		}
 		String badge = decoration != null ? decoration.getBadge() : null;
+		// The label is not floating: it is drawn in the middle of the element, whatever its relative position
 		gr.setText(badge);
-		if (badge != null) {
-			gr.setRelativeTextX(1.0);
-			gr.setRelativeTextY(0.0);
-		}
 	}
 
 	@Override
