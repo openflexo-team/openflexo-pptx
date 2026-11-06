@@ -29,7 +29,7 @@
 		<Localized key="file_name" lang="English" value="file name" />
 		<Localized key="file_name" lang="French" value="fichier" />
 		<Localized key="image" lang="English" value="image" />
-		<Localized key="image" lang="French" value="image" />
+		<Localized key="image" lang="French" value="Image" />
 	</LocalizedDictionary>
 	<Parameter name="title" value="Picture" />
 </Panel>

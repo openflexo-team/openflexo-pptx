@@ -41,7 +41,7 @@
 		<Localized key="line_width" lang="English" value="line width" />
 		<Localized key="line_width" lang="French" value="épaisseur du trait" />
 		<Localized key="rotation" lang="English" value="rotation" />
-		<Localized key="rotation" lang="French" value="rotation" />
+		<Localized key="rotation" lang="French" value="Rotation" />
 	</LocalizedDictionary>
 	<Parameter name="title" value="Shape" />
 </Panel>
