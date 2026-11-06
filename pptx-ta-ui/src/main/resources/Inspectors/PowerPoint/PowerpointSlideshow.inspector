@@ -24,7 +24,6 @@
 		</Tab>
 	</TabPanel>
 	<LocalizedDictionary>
-		<Localized key="Basic" lang="French" value="Basique" />
 		<Localized key="page_height" lang="English" value="page height" />
 		<Localized key="page_height" lang="French" value="hauteur de page" />
 		<Localized key="page_width" lang="English" value="page width" />

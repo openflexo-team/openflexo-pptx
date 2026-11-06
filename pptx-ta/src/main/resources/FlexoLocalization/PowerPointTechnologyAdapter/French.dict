@@ -6,3 +6,7 @@ geometry=geometry
 group=group
 fill_color=fill_color
 line_color=line_color
+choose_powerpoint_slide=choose_powerpoint_slide
+please_select_a_slide_to_import=please_select_a_slide_to_import
+please_select_a_valid_powerpoint_file=please_select_a_valid_powerpoint_file
+please_set_diagram_name=please_set_diagram_name

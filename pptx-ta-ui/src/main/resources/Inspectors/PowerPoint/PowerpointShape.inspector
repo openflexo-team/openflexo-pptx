@@ -40,7 +40,6 @@
 		</Tab>
 	</TabPanel>
 	<LocalizedDictionary>
-		<Localized key="Basic" lang="French" value="Basique" />
 		<Localized key="group" lang="English" value="group" />
 		<Localized key="group" lang="French" value="groupe" />
 		<Localized key="height" lang="English" value="height" />

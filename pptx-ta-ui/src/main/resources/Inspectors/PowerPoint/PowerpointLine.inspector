@@ -36,7 +36,6 @@
 		</Tab>
 	</TabPanel>
 	<LocalizedDictionary>
-		<Localized key="Basic" lang="French" value="Basique" />
 		<Localized key="end_decoration" lang="English" value="end" />
 		<Localized key="end_decoration" lang="French" value="fin" />
 		<Localized key="start_decoration" lang="English" value="start" />

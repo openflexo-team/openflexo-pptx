@@ -24,7 +24,6 @@
 		</Tab>
 	</TabPanel>
 	<LocalizedDictionary>
-		<Localized key="Basic" lang="French" value="Basique" />
 		<Localized key="content_type" lang="English" value="content type" />
 		<Localized key="content_type" lang="French" value="format" />
 		<Localized key="file_name" lang="English" value="file name" />

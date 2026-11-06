@@ -32,7 +32,6 @@
 		</Tab>
 	</TabPanel>
 	<LocalizedDictionary>
-		<Localized key="Basic" lang="French" value="Basique" />
 		<Localized key="layout" lang="English" value="layout" />
 		<Localized key="layout" lang="French" value="disposition" />
 		<Localized key="shapes" lang="English" value="shapes" />

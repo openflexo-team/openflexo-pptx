@@ -16,7 +16,6 @@
 		</Tab>
 	</TabPanel>
 	<LocalizedDictionary>
-		<Localized key="Basic" lang="French" value="Basique" />
 		<Localized key="children" lang="English" value="children" />
 		<Localized key="children" lang="French" value="éléments" />
 	</LocalizedDictionary>

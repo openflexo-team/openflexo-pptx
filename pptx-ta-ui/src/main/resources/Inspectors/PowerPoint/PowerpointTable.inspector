@@ -20,7 +20,6 @@
 		</Tab>
 	</TabPanel>
 	<LocalizedDictionary>
-		<Localized key="Basic" lang="French" value="Basique" />
 		<Localized key="rows" lang="English" value="rows" />
 		<Localized key="rows" lang="French" value="lignes" />
 		<Localized key="columns" lang="English" value="columns" />

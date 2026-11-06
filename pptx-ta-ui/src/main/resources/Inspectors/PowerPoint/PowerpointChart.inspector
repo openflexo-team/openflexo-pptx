@@ -24,7 +24,6 @@
 		</Tab>
 	</TabPanel>
 	<LocalizedDictionary>
-		<Localized key="Basic" lang="French" value="Basique" />
 		<Localized key="title" lang="English" value="title" />
 		<Localized key="title" lang="French" value="titre" />
 		<Localized key="chart_type" lang="English" value="kind of chart" />
