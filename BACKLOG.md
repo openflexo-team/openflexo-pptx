@@ -209,3 +209,13 @@ through a rank among siblings sharing an id) is found again from its URI.
 - A `PowerpointActorReference` keeps the object it resolved: after the slideshow resource is unloaded and loaded again in the same
   session, it still holds the former object.
 - An element whose id changed (a deck regenerated, or renumbered by PowerPoint because of PPTX-D-1) is no longer found.
+
+---
+
+### PPTX-F-7 — Build the view of a slide when it is first shown  ·  `DONE`
+
+**Problem.** Opening a slideshow (in the module view of pptx-ta-ui, or in a PowerPoint free model of the Free Modelling Editor) built at once the view of every slide — a Diana editor, the layout of its texts, the Swing views of its shapes — in the event dispatch thread: 7.6 s for the 13 slides of `SaintAubin-ED-Project-Kickoff.pptx`, about 6.5 s of them for slides not shown.
+
+**Done.** `PowerpointSlideshowView` builds the view of a slide the first time it is shown or asked for (`showSlide`, `getSlideView`); the decoration provider and the represented elements are kept and installed on views built later. Opening the same free model now takes 3.7 s (measured under Eclipse, 2026-11-06); showing another slide for the first time costs the building of its view.
+
+**Left.** Each slide editor makes Diana load its layout manager inspector group again (`InspectedLayoutManagerSpecifications`, about 0.2 s per editor, more for the first one): to be shared, in Diana.

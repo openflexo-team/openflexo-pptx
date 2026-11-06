@@ -92,7 +92,11 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 
 	private final PowerpointSlideshow slideshow;
 	private final FlexoPerspective declaredPerspective;
+	// One entry per slide, null until the view of the slide is first needed: building every slide (a Diana editor, the layout of its
+	// texts) when the slideshow is opened cost about half a second per slide
 	private final List<PowerpointSlideView> slideViews = new ArrayList<>();
+	// Installed on every slide view, including those built later
+	private Function<FlexoObject, List<? extends PowerpointSlideElement>> representedElements;
 	private static final String SLIDE_LEAF = "slide";
 	private static final String THUMBNAILS_LEAF = "thumbnails";
 
@@ -122,15 +126,14 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 		declaredPerspective = perspective;
 		this.slideshow = slideshow;
 		for (int i = 0; i < slideshow.getPowerpointSlides().size(); i++) {
-			PowerpointSlideView slideView = new PowerpointSlideView(slideshow.getPowerpointSlides().get(i), controller);
-			slideViews.add(slideView);
-			slidesPanel.add(slideView, String.valueOf(i));
+			slideViews.add(null);
 		}
 		thumbnailsPanel = new PowerpointSlideThumbnailsPanel(slideshow, this::slideChosen, thumbnailsPosition != ThumbnailsPosition.RIGHT);
 		add(makeSplitPane(), BorderLayout.CENTER);
-		browser = controller != null && !slideViews.isEmpty() ? new PowerpointSlideBrowser(slideViews.get(0).getSlide(), controller) : null;
-		if (!slideViews.isEmpty()) {
-			showSlide(slideViews.get(0).getSlide());
+		List<PowerpointSlide> slides = slideshow.getPowerpointSlides();
+		browser = controller != null && !slides.isEmpty() ? new PowerpointSlideBrowser(slides.get(0), controller) : null;
+		if (!slides.isEmpty()) {
+			showSlide(slides.get(0));
 		}
 	}
 
@@ -174,8 +177,9 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 		if (index < 0) {
 			return;
 		}
-		if (shownSlideView != slideViews.get(index)) {
-			shownSlideView = slideViews.get(index);
+		PowerpointSlideView slideView = getSlideView(index);
+		if (shownSlideView != slideView) {
+			shownSlideView = slideView;
 			slidesLayout.show(slidesPanel, String.valueOf(index));
 		}
 		thumbnailsPanel.setSelectedSlide(slide);
@@ -185,14 +189,45 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 	}
 
 	/**
-	 * Return the view of supplied slide, or null when it is not a slide of this slideshow
+	 * Return the view of supplied slide, building it when it is first asked for, or null when it is not a slide of this slideshow
 	 * 
 	 * @param slide
 	 * @return
 	 */
 	public PowerpointSlideView getSlideView(PowerpointSlide slide) {
-		int index = slideshow.getPowerpointSlides().indexOf(slide);
-		return index >= 0 && index < slideViews.size() ? slideViews.get(index) : null;
+		return getSlideView(slideshow.getPowerpointSlides().indexOf(slide));
+	}
+
+	private PowerpointSlideView getSlideView(int index) {
+		if (index < 0 || index >= slideViews.size()) {
+			return null;
+		}
+		PowerpointSlideView slideView = slideViews.get(index);
+		if (slideView == null) {
+			slideView = new PowerpointSlideView(slideshow.getPowerpointSlides().get(index), controller);
+			if (decorationProvider != null) {
+				slideView.getEditor().getDrawing().setDecorationProvider(decorationProvider);
+			}
+			if (representedElements != null) {
+				slideView.getEditor().setRepresentedElements(representedElements);
+			}
+			slideViews.set(index, slideView);
+			slidesPanel.add(slideView, String.valueOf(index));
+		}
+		return slideView;
+	}
+
+	/**
+	 * Return the views of the slides built so far
+	 */
+	private List<PowerpointSlideView> getBuiltSlideViews() {
+		List<PowerpointSlideView> returned = new ArrayList<>();
+		for (PowerpointSlideView slideView : slideViews) {
+			if (slideView != null) {
+				returned.add(slideView);
+			}
+		}
+		return returned;
 	}
 
 	public ThumbnailsPosition getThumbnailsPosition() {
@@ -234,7 +269,7 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 	 */
 	public void setDecorationProvider(PowerpointElementDecorationProvider provider) {
 		decorationProvider = provider;
-		for (PowerpointSlideView slideView : slideViews) {
+		for (PowerpointSlideView slideView : getBuiltSlideViews()) {
 			slideView.getEditor().getDrawing().setDecorationProvider(provider);
 		}
 	}
@@ -246,7 +281,8 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 	 * @param representedElements
 	 */
 	public void setRepresentedElements(Function<FlexoObject, List<? extends PowerpointSlideElement>> representedElements) {
-		for (PowerpointSlideView slideView : slideViews) {
+		this.representedElements = representedElements;
+		for (PowerpointSlideView slideView : getBuiltSlideViews()) {
 			slideView.getEditor().setRepresentedElements(representedElements);
 		}
 	}
@@ -279,7 +315,7 @@ public class PowerpointSlideshowView extends JPanel implements SelectionSynchron
 	@Override
 	public void deleteModuleView() {
 		setDecorationProvider(null);
-		for (PowerpointSlideView slideView : slideViews) {
+		for (PowerpointSlideView slideView : getBuiltSlideViews()) {
 			slideView.delete();
 		}
 		slideViews.clear();
