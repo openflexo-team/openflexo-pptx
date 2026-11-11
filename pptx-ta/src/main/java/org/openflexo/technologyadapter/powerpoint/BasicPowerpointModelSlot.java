@@ -49,7 +49,6 @@ import org.openflexo.foundation.fml.annotations.DeclareFlexoRoles;
 import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
-import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.technologyadapter.powerpoint.fml.PowerpointActorReference;
 import org.openflexo.technologyadapter.powerpoint.fml.PowerpointShapeRole;
 import org.openflexo.technologyadapter.powerpoint.fml.PowerpointSlideRole;
@@ -73,7 +72,6 @@ import org.openflexo.technologyadapter.powerpoint.rm.PowerpointSlideshowResource
 @DeclareFetchRequests({ SelectPowerpointSlide.class, SelectPowerpointShape.class })
 @ModelEntity
 @ImplementationClass(BasicPowerpointModelSlot.BasicPowerpointModelSlotImpl.class)
-@XMLElement
 @FML("BasicPowerpointModelSlot")
 public interface BasicPowerpointModelSlot extends PowerpointModelSlot {
 

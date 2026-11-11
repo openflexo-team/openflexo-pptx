@@ -46,14 +46,12 @@ import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.foundation.fml.rt.RunTimeEvaluationContext;
 import org.openflexo.pamela.annotations.ImplementationClass;
 import org.openflexo.pamela.annotations.ModelEntity;
-import org.openflexo.pamela.annotations.XMLElement;
 import org.openflexo.technologyadapter.powerpoint.BasicPowerpointModelSlot;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlide;
 import org.openflexo.technologyadapter.powerpoint.model.PowerpointSlideshow;
 
 @ModelEntity
 @ImplementationClass(AddPowerpointSlide.AddPowerpointSlideImpl.class)
-@XMLElement
 @FML("AddPowerpointSlide")
 public interface AddPowerpointSlide extends PowerpointAction<PowerpointSlide> {
 
