@@ -42,3 +42,12 @@ failed with a `NullPointerException` in `PowerpointActorReference.getObjectURI()
 
 **Cause (verified).** The model slot created its URI processor through the FML model factory, which does not know that PAMELA
 entity (and could not have built it: its only constructor took a parameter). The processor is now a plain helper class.
+
+### PPTX-D-6 — Reading the URI of a PowerPoint actor reference without its model slot instance throws a `NullPointerException`  ·  `DONE`
+
+**Symptom (read, 2026-11-14).** `PowerpointActorReference.getObjectURI()` dereferenced `getModelSlotInstance()` without checking it, unlike
+`setModellingElement`. PAMELA reads that getter when it collects the embedded objects of an instance being deleted, after its model slot
+instance is gone: the deletion then failed with an NPE. Found with `XML-D-1` (openflexo-xml), where it was observed; the same code is here.
+`CORE-F-11` (openflexo-core) made the NPE visible: `DeleteAction` used to print and swallow it.
+
+**Fixed (2026-11-14).** Without a model slot instance, `getObjectURI()` returns the URI last computed.

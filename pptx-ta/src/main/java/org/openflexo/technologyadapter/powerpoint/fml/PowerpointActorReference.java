@@ -115,7 +115,8 @@ public interface PowerpointActorReference<T extends PowerpointObject> extends Ac
 
 		@Override
 		public String getObjectURI() {
-			if (object != null) {
+			// Without its model slot instance (an instance being deleted), the URI is the one last computed
+			if (object != null && getModelSlotInstance() != null) {
 				ModelSlotInstance msInstance = getModelSlotInstance();
 				objectURI = msInstance.getModelSlot().getURIForObject(msInstance.getAccessedResourceData(), object);
 			}
