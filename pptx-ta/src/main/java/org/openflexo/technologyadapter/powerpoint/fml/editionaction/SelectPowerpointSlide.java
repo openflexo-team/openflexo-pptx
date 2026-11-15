@@ -38,6 +38,7 @@
 
 package org.openflexo.technologyadapter.powerpoint.fml.editionaction;
 
+import org.openflexo.foundation.fml.rt.error.FMLExecutionException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +70,7 @@ public interface SelectPowerpointSlide extends FetchRequest<BasicPowerpointModel
 		}
 
 		@Override
-		public List<PowerpointSlide> performExecute(RunTimeEvaluationContext evaluationContext) {
+		public List<PowerpointSlide> performExecute(RunTimeEvaluationContext evaluationContext) throws FMLExecutionException {
 			PowerpointSlideshow slideshow = getReceiver(evaluationContext);
 			if (slideshow == null) {
 				return new ArrayList<>();

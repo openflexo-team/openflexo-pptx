@@ -38,6 +38,7 @@
 
 package org.openflexo.technologyadapter.powerpoint.fml.editionaction;
 
+import org.openflexo.foundation.fml.rt.error.FMLExecutionException;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -89,7 +90,7 @@ public interface AddPowerpointShape extends PowerpointAction<PowerpointShape> {
 		}
 
 		@Override
-		public PowerpointShape execute(RunTimeEvaluationContext evaluationContext) {
+		public PowerpointShape execute(RunTimeEvaluationContext evaluationContext) throws FMLExecutionException {
 
 			PowerpointSlideshow receiver = getReceiver(evaluationContext);
 
