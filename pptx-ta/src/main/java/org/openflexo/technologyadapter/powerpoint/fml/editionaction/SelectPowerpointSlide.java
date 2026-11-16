@@ -38,6 +38,7 @@
 
 package org.openflexo.technologyadapter.powerpoint.fml.editionaction;
 
+import org.openflexo.foundation.fml.rt.error.FMLNullReferenceError;
 import org.openflexo.foundation.fml.rt.error.FMLExecutionException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -73,7 +74,8 @@ public interface SelectPowerpointSlide extends FetchRequest<BasicPowerpointModel
 		public List<PowerpointSlide> performExecute(RunTimeEvaluationContext evaluationContext) throws FMLExecutionException {
 			PowerpointSlideshow slideshow = getReceiver(evaluationContext);
 			if (slideshow == null) {
-				return new ArrayList<>();
+				// A null source (CORE-F-11)
+				throw new FMLNullReferenceError(getStringRepresentation() + ": nothing to select from");
 			}
 			return filterWithConditions(new ArrayList<>(slideshow.getPowerpointSlides()), evaluationContext);
 		}

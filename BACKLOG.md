@@ -219,3 +219,17 @@ through a rank among siblings sharing an id) is found again from its URI.
 **Done.** `PowerpointSlideshowView` builds the view of a slide the first time it is shown or asked for (`showSlide`, `getSlideView`); the decoration provider and the represented elements are kept and installed on views built later. Opening the same free model now takes 3.7 s (measured under Eclipse, 2026-11-06); showing another slide for the first time costs the building of its view.
 
 **Left.** Each slide editor makes Diana load its layout manager inspector group again (`InspectedLayoutManagerSpecifications`, about 0.2 s per editor, more for the first one): to be shared, in Diana.
+
+## FML runtime errors
+
+### PPTX-F-8 — The pptx adapter raises typed FML errors instead of returning null after a warning or a printed stack  ·  `DONE`
+
+**Problem.** Part of `CORE-F-11` phase 6 (`openflexo-core/BACKLOG.md`), done with the other remaining adapters in one batch (asked by the user, 2026-11-16), with the rules settled on the first adapters (xlsx, xml, jdbc, rest, formod, docx): the edition actions caught the failures of their evaluations (four catches printing the stack, or a log), and went on with null after a warning.
+
+**Rules applied (decided with the user on the first adapters).** Evaluations through `FMLEvaluation`; every `execute` / `performExecute` declares `throws FMLExecutionException`; a null receiver, model, document, name or required input is an `FMLNullReferenceError`; a select from a null source is an `FMLNullReferenceError` naming the select; a foreseen failure of the technology an `FMLTechnologyError` with a message of its own; a `ModelDefinitionException` an `FMLInternalError`; a cancelled loading an `FMLCancellation`; a typed failure of `AbstractCreateResource` rethrown unchanged; a log just before a throw removed (the failure is reported once, by the editor); the `System.out` traces of the actions removed. Scope: the paths that FML execution goes through; loading and conversion code left.
+
+**Done (2026-11-16).**
+- `AddPowerpointSlide`, `AddPowerpointShape`: a null slideshow or slide is an `FMLNullReferenceError` (null after a warning).
+- `SelectPowerpointSlide`, `SelectPowerpointShape`: a null slideshow is an `FMLNullReferenceError` (an empty result before).
+
+**Verified (2026-11-16).** pptx-ta-test 12 green; ECJ compiles pptx-ta. No new test.

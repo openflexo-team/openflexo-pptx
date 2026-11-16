@@ -38,14 +38,14 @@
 
 package org.openflexo.technologyadapter.powerpoint.fml.editionaction;
 
+import org.openflexo.foundation.fml.rt.error.FMLNullReferenceError;
+import org.openflexo.foundation.fml.rt.error.FMLEvaluation;
 import org.openflexo.foundation.fml.rt.error.FMLExecutionException;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.openflexo.connie.DataBinding;
-import org.openflexo.connie.exception.NullReferenceException;
-import org.openflexo.connie.exception.TypeMismatchException;
 import org.openflexo.foundation.fml.annotations.FML;
 import org.openflexo.foundation.fml.rt.RunTimeEvaluationContext;
 import org.openflexo.pamela.annotations.ImplementationClass;
@@ -94,22 +94,16 @@ public interface AddPowerpointShape extends PowerpointAction<PowerpointShape> {
 
 			PowerpointSlideshow receiver = getReceiver(evaluationContext);
 
-			try {
-				PowerpointSlide powerpointSlide = getPowerpointSlide().getBindingValue(evaluationContext);
-				if (powerpointSlide != null) {
-					String textValue = getText().isSet() ? getText().getBindingValue(evaluationContext) : "";
-					PowerpointTextBox textBox = powerpointSlide.addTextBox(textValue != null ? textValue : "", 50, 50, 300, 50);
-					if (receiver != null) {
-						receiver.setIsModified();
-					}
-					return textBox;
+			PowerpointSlide powerpointSlide = FMLEvaluation.evaluate(getPowerpointSlide(), evaluationContext, this);
+			if (powerpointSlide != null) {
+				String textValue = getText().isSet() ? FMLEvaluation.evaluate(getText(), evaluationContext, this) : "";
+				PowerpointTextBox textBox = powerpointSlide.addTextBox(textValue != null ? textValue : "", 50, 50, 300, 50);
+				if (receiver != null) {
+					receiver.setIsModified();
 				}
-				logger.warning("Creating a shape requires a target slide");
-			} catch (TypeMismatchException | NullReferenceException | ReflectiveOperationException e) {
-				logger.log(Level.WARNING, "Cannot evaluate binding while adding a PowerPoint shape", e);
+				return textBox;
 			}
-
-			return null;
+			throw new FMLNullReferenceError("Creating a shape requires a target slide");
 		}
 
 		@Override

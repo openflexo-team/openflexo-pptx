@@ -38,6 +38,7 @@
 
 package org.openflexo.technologyadapter.powerpoint.fml.editionaction;
 
+import org.openflexo.foundation.fml.rt.error.FMLNullReferenceError;
 import org.openflexo.foundation.fml.rt.error.FMLExecutionException;
 import java.lang.reflect.Type;
 import java.util.logging.Logger;
@@ -79,8 +80,7 @@ public interface AddPowerpointSlide extends PowerpointAction<PowerpointSlide> {
 			PowerpointSlideshow receiver = getReceiver(evaluationContext);
 
 			if (receiver == null) {
-				logger.warning("Model slot not correctly initialised : slideshow is null");
-				return null;
+				throw new FMLNullReferenceError("Model slot not correctly initialised : slideshow is null");
 			}
 
 			// XSLF appends the new slide at the end of the presentation ; positional insertion
