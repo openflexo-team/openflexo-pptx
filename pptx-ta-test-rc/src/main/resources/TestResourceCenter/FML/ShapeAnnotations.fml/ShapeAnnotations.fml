@@ -14,7 +14,7 @@ public model ShapeAnnotations {
     public PowerpointSlideshow slideshow with PPT::BasicPowerpointModelSlot();
 
     create(required Resource<PowerpointSlideshow> resource) {
-        connect slideshow using parameters.resource;
+        connect slideshow using resource;
     }
 
     public concept ShapeNote {
@@ -22,8 +22,8 @@ public model ShapeAnnotations {
         public String label;
 
         create(required PowerpointShape aShape, required String aLabel) {
-            shape = parameters.aShape;
-            label = parameters.aLabel;
+            shape = aShape;
+            label = aLabel;
         }
     }
 
@@ -32,8 +32,8 @@ public model ShapeAnnotations {
         public String label;
 
         create(required PowerpointSlide aSlide, required String aLabel) {
-            slide = parameters.aSlide;
-            label = parameters.aLabel;
+            slide = aSlide;
+            label = aLabel;
         }
     }
 }

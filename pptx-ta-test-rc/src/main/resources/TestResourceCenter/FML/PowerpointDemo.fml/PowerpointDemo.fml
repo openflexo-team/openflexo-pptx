@@ -11,7 +11,7 @@ public model PowerpointDemo {
     public PowerpointSlideshow slideshow with PPT::BasicPowerpointModelSlot();
 
     create(required Resource<PowerpointSlideshow> resource) {
-        connect slideshow using parameters.resource;
+        connect slideshow using resource;
     }
 
     public List<PowerpointSlide> allSlides() {
@@ -23,6 +23,6 @@ public model PowerpointDemo {
     }
 
     public List<PowerpointShape> shapesWithText(String searched) {
-        return select PowerpointShape from (slideshow) where (selected.text == parameters.searched);
+        return select PowerpointShape from (slideshow) where (selected.text == searched);
     }
 }
