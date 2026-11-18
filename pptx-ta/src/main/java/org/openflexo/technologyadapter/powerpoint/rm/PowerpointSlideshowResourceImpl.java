@@ -48,7 +48,7 @@ import java.util.logging.Logger;
 
 import org.apache.poi.poifs.filesystem.OfficeXmlFileException;
 import org.apache.poi.xslf.usermodel.XMLSlideShow;
-import org.openflexo.foundation.FlexoException;
+import org.openflexo.foundation.OpenflexoRuntimeException;
 import org.openflexo.foundation.IOFlexoException;
 import org.openflexo.foundation.resource.FileIODelegate;
 import org.openflexo.foundation.resource.FileWritingLock;
@@ -144,7 +144,7 @@ public abstract class PowerpointSlideshowResourceImpl extends PamelaResourceImpl
 	public PowerpointSlideshow getPowerpointSlideshow() {
 		try {
 			return getResourceData();
-		} catch (ResourceLoadingCancelledException | FileNotFoundException | FlexoException e) {
+		} catch (ResourceLoadingCancelledException | FileNotFoundException | OpenflexoRuntimeException e) {
 			logger.log(Level.WARNING, "Cannot access PowerPoint slideshow resource data", e);
 			return null;
 		}
