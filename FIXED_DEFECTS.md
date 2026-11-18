@@ -7,6 +7,8 @@ with what was verified, the cause and the fix. Identifiers are those of `KNOWN_D
 
 ### PPTX-D-2 — White elements invisible on NordicEBikes  ·  `DONE`
 
+**GitHub:** [openflexo-team/openflexo-pptx#2](https://github.com/openflexo-team/openflexo-pptx/issues/2)
+
 **Symptom.** On every slide of `NordicEBikes-Design-Review-DR2.pptx` the background was white instead of a blue grid, so
 that the white texts, the white lines of the drawings and the white "Cumulative %" line of the Pareto chart (slide 8)
 were invisible.
@@ -15,6 +17,8 @@ were invisible.
 paint. Fixed by PPTX-F-4.
 
 ### PPTX-D-3 — A .pptx sometimes not found when the technology adapter is activated  ·  `DONE`
+
+**GitHub:** [openflexo-team/openflexo-pptx#3](https://github.com/openflexo-team/openflexo-pptx/issues/3)
 
 **Symptom.** After activating the PowerPoint technology adapter in the application, the folder `PPT/Business` of the
 resource center `pptx-ta-test-rc/src/main/resources/TestResourceCenter` sometimes showed 6 or 7 of its 8 sample decks.
@@ -27,6 +31,8 @@ while it was being updated: GINA-D-6 (gina), fixed there.
 
 ### PPTX-D-4 — `PowerpointShapeRole` typed as a slide  ·  `DONE`
 
+**GitHub:** [openflexo-team/openflexo-pptx#5](https://github.com/openflexo-team/openflexo-pptx/issues/5)
+
 **Symptom.** `PowerpointShapeRole` extended `FlexoRole<PowerpointSlide>` and its type was `PowerpointSlide`: a role declared
 `PowerpointShape shape with PPT::PowerpointShapeRole()` was typed as a slide, so that assigning it a shape (the result of
 `AddPowerpointShape` or `select PowerpointShape from …`) mixed two types, and its actor reference was built for a slide.
@@ -36,6 +42,8 @@ now exercised by `ShapeAnnotations.fml` (PPTX-F-5).
 
 ### PPTX-D-5 — No actor reference of a PowerPoint role could be saved  ·  `DONE`
 
+**GitHub:** [openflexo-team/openflexo-pptx#7](https://github.com/openflexo-team/openflexo-pptx/issues/7)
+
 **Symptom.** Assigning a slide or a shape to a `PowerpointSlideRole` / `PowerpointShapeRole` logged
 `Unknown entity 'org.openflexo.technologyadapter.powerpoint.BasicPowerpointModelSlotURIProcessor'`, and saving the instance then
 failed with a `NullPointerException` in `PowerpointActorReference.getObjectURI()`.
@@ -44,6 +52,8 @@ failed with a `NullPointerException` in `PowerpointActorReference.getObjectURI()
 entity (and could not have built it: its only constructor took a parameter). The processor is now a plain helper class.
 
 ### PPTX-D-6 — Reading the URI of a PowerPoint actor reference without its model slot instance throws a `NullPointerException`  ·  `DONE`
+
+**GitHub:** [openflexo-team/openflexo-pptx#9](https://github.com/openflexo-team/openflexo-pptx/issues/9)
 
 **Symptom (read, 2026-11-14).** `PowerpointActorReference.getObjectURI()` dereferenced `getModelSlotInstance()` without checking it, unlike
 `setModellingElement`. PAMELA reads that getter when it collects the embedded objects of an instance being deleted, after its model slot

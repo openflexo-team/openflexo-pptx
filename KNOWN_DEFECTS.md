@@ -12,6 +12,8 @@ Fixed defects are moved to [`FIXED_DEFECTS.md`](./FIXED_DEFECTS.md) once their s
 
 ### PPTX-D-1 — Duplicated shape identifiers in three sample decks  ·  `TODO`
 
+**GitHub:** [openflexo-team/openflexo-pptx#1](https://github.com/openflexo-team/openflexo-pptx/issues/1)
+
 **Symptom.** In `pptx-ta-test-rc`, 9 slides hold two shapes with the same `cNvPr id`, which the OOXML format forbids
 (PowerPoint renumbers them silently when it opens the file):
 - `CycloCity-Company-Presentation.pptx`, slides 8, 9, 11, 12 and 14: the slide number placeholder takes id 25, already

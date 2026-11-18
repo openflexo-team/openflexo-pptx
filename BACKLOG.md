@@ -13,6 +13,8 @@ Status legend: `TODO` · `IN PROGRESS` · `BLOCKED` · `DONE` · `DEFERRED`.
 
 ### PPTX-F-1 — Select and manipulate the elements of a slide  ·  `IN PROGRESS`
 
+**GitHub:** [openflexo-team/openflexo-pptx#11](https://github.com/openflexo-team/openflexo-pptx/issues/11)
+
 **Problem.** The slideshow view only displayed each slide as an image rendered by POI: nothing could be selected,
 neither in the slide nor in a tree of its contents.
 
@@ -84,6 +86,8 @@ selected in the browser is selected in its slide.
 
 ### PPTX-F-6 — Embed the slideshow view in another module  ·  `DONE`
 
+**GitHub:** [openflexo-team/openflexo-pptx#13](https://github.com/openflexo-team/openflexo-pptx/issues/13)
+
 **Problem.** The FreeModellingEditor will show a presentation with `PowerpointSlideshowView` and an overlay: the user selects shapes
 and declares them as instances of concepts. The view offered no contextual menu, no way to paint over the elements, and the elements
 of a slideshow were not mapped to its view.
@@ -116,6 +120,8 @@ The contextual menu was not tried in the running application.
 
 ### PPTX-F-2 — Reflect every element of the sample decks  ·  `DONE`
 
+**GitHub:** [openflexo-team/openflexo-pptx#15](https://github.com/openflexo-team/openflexo-pptx/issues/15)
+
 **Problem.** The model only reflected text boxes, auto-shapes, pictures, connectors and groups, and the text of a shape
 as a single string. The sample decks of `pptx-ta-test-rc` (8 decks, 106 slides) also hold tables, charts, connectors
 glued to shapes and speaker notes, that their `.expected.md` rely on (RACI, glossary, requirements, FMEA, budget,
@@ -143,6 +149,8 @@ with notes; the slide view is built without error for the 106 slides.
 
 ### PPTX-F-3 — Draw the charts  ·  `DONE`
 
+**GitHub:** [openflexo-team/openflexo-pptx#17](https://github.com/openflexo-team/openflexo-pptx/issues/17)
+
 **Problem.** POI does not render charts: for a graphic frame it only draws the fallback picture that some editors join
 (`mc:Fallback`), which none of the sample decks carries. Charts were blank in the slide view and in the thumbnails.
 
@@ -163,6 +171,8 @@ trend lines; scheme colors fall back to the default Office palette (the sample d
 
 ### PPTX-F-4 — Paint the pattern fills  ·  `DONE`
 
+**GitHub:** [openflexo-team/openflexo-pptx#19](https://github.com/openflexo-team/openflexo-pptx/issues/19)
+
 **Problem.** POI does not paint pattern fills (`a:pattFill`): it only knows solid, picture, gradient and theme fills,
 and silently leaves a pattern unpainted. The sample decks hold 33 of them: the blue grid background of every slide of
 NordicEBikes (whose white texts were then invisible, PPTX-D-2), the diagonal hatchings of some of its shapes, the
@@ -179,6 +189,8 @@ the pattern, then POI draws the rest of the shape), in the slide view and the th
 **Limits.** Pattern fills of table cells and theme or scheme colors of patterns are not handled (none in the samples).
 
 ### PPTX-F-5 — Identify the elements of a slideshow across reloads  ·  `DONE`
+
+**GitHub:** [openflexo-team/openflexo-pptx#21](https://github.com/openflexo-team/openflexo-pptx/issues/21)
 
 **Problem.** A VirtualModelInstance pointing at slides or shapes could not be reloaded: the URI of an element was a positional path
 (`<resource>/slide[n]/shape[i]`), and the model slot only resolved it from an in-memory cache, empty after a reload. A positional
@@ -214,6 +226,8 @@ through a rank among siblings sharing an id) is found again from its URI.
 
 ### PPTX-F-7 — Build the view of a slide when it is first shown  ·  `DONE`
 
+**GitHub:** [openflexo-team/openflexo-pptx#23](https://github.com/openflexo-team/openflexo-pptx/issues/23)
+
 **Problem.** Opening a slideshow (in the module view of pptx-ta-ui, or in a PowerPoint free model of the Free Modelling Editor) built at once the view of every slide — a Diana editor, the layout of its texts, the Swing views of its shapes — in the event dispatch thread: 7.6 s for the 13 slides of `SaintAubin-ED-Project-Kickoff.pptx`, about 6.5 s of them for slides not shown.
 
 **Done.** `PowerpointSlideshowView` builds the view of a slide the first time it is shown or asked for (`showSlide`, `getSlideView`); the decoration provider and the represented elements are kept and installed on views built later. Opening the same free model now takes 3.7 s (measured under Eclipse, 2026-11-06); showing another slide for the first time costs the building of its view.
@@ -223,6 +237,8 @@ through a rank among siblings sharing an id) is found again from its URI.
 ## FML runtime errors
 
 ### PPTX-F-8 — The pptx adapter raises typed FML errors instead of returning null after a warning or a printed stack  ·  `DONE`
+
+**GitHub:** [openflexo-team/openflexo-pptx#25](https://github.com/openflexo-team/openflexo-pptx/issues/25)
 
 **Problem.** Part of `CORE-F-11` phase 6 (`openflexo-core/BACKLOG.md`), done with the other remaining adapters in one batch (asked by the user, 2026-11-16), with the rules settled on the first adapters (xlsx, xml, jdbc, rest, formod, docx): the edition actions caught the failures of their evaluations (four catches printing the stack, or a log), and went on with null after a warning.
 
